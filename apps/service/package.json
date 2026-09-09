@@ -1,0 +1,19 @@
+{
+  "name": "@replywork/service",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@replywork/adapters": "workspace:*",
+    "@replywork/contracts": "workspace:*",
+    "@replywork/core": "workspace:*",
+    "fastify": "5.12.0",
+    "zod": "4.5.4"
+  }
+}

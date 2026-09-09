@@ -1,0 +1,37 @@
+{
+  "name": "replywork",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Customer conversations turned into verified business work.",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "author": "Ammar Hassan",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=12.0.0 <13"
+  },
+  "packageManager": "pnpm@12.3.4",
+  "scripts": {
+    "build": "tsc -b --pretty false",
+    "clean": "tsc -b --clean",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false",
+    "verify": "prettier --check . && eslint . && tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false && vitest run"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.13.3",
+    "drizzle-kit": "0.31.10",
+    "eslint": "10.0.1",
+    "prettier": "3.9.6",
+    "supabase": "2.117.0",
+    "tsx": "4.23.13",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.70.0",
+    "vitest": "5.0.0"
+  }
+}
