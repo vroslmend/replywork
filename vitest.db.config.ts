@@ -14,7 +14,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ["packages/**/*.db.test.ts"],
+    include: ["apps/**/*.db.test.ts", "packages/**/*.db.test.ts"],
     restoreMocks: true,
   },
 });
