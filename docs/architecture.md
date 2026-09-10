@@ -35,6 +35,10 @@ The webhook path verifies the signature over the original bytes, rejects stale r
 supported events, and asks the delivery queue to enqueue the delivery once. A successful response
 means the work has been admitted, not completed.
 
-The persistent queue adapter will commit the delivery receipt and queue message together. The worker
-will acknowledge a message only after recording its outcome. External writes will use a separate
-idempotency key derived from the admitted delivery.
+The persistent queue adapter commits the delivery receipt and queue message together. The worker
+archives a message only after recording its outcome. Chatwoot writes use a separate deterministic
+source ID derived from the admitted delivery, and the provider checks for that source ID before it
+repeats a request.
+
+An outgoing reply becomes a public Chatwoot message. A handoff becomes a private operator note,
+optional team assignment, and an open conversation. Business policy remains outside the provider.

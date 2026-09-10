@@ -11,17 +11,20 @@ rules, integration boundaries, approvals, and audit record.
 
 ## Current boundary
 
-The repository currently implements and tests the inbound Chatwoot event boundary:
+The repository currently implements and tests the durable Chatwoot delivery path:
 
 - HMAC verification over the original request body;
 - replay-window checks;
 - message validation and normalization;
 - filtering for private, outgoing, and unsupported messages;
-- stable delivery keys; and
-- idempotent admission through an injected queue contract.
+- atomic receipt and queue admission in PostgreSQL;
+- a queue worker with visibility timeout, audit records, and archive-on-success behavior;
+- outgoing replies through the Chatwoot application API; and
+- human handoff through a private note, optional team assignment, and an open conversation.
 
-Database-backed delivery, outgoing replies, and human handoff will be added through the same
-contracts. They are not represented here as finished features.
+The default test suite remains offline. Database tests exercise the complete signed webhook to
+outgoing API-request path against local PostgreSQL and a controlled HTTP boundary. A live Chatwoot
+round trip remains an integration step rather than a claimed feature.
 
 ## Shape
 

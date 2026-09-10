@@ -1,12 +1,12 @@
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 
 import {
+  ChatwootConversationProvider,
   createDatabase,
   PgmqDeliveryQueue,
   PostgresAuditStore,
   signChatwootPayload,
 } from "@replywork/adapters";
-import { FakeConversationProvider } from "@replywork/testkit";
 
 import { createServiceRuntime } from "../src/runtime.js";
 import { runWorkerOnce } from "../src/worker.js";
@@ -26,10 +26,10 @@ const deliveryKey = `chatwoot:delivery:${deliveryId}`;
 const messageId = `runtime-message-${testRun}`;
 const timestamp = String(Math.floor(Date.now() / 1000));
 const payload = JSON.stringify({
-  account: { id: "runtime-account" },
+  account: { id: "7" },
   content: "Synthetic runtime database test message.",
   content_type: "text",
-  conversation: { id: "runtime-conversation", inbox_id: "runtime-inbox" },
+  conversation: { id: "19", inbox_id: "3" },
   created_at: timestamp,
   event: "message_created",
   id: messageId,
@@ -114,7 +114,26 @@ describe("persistent service runtime", () => {
 
     expect(state).toEqual({ auditEntries: 1, queuedMessages: 1, receipts: 1 });
 
-    const conversationProvider = new FakeConversationProvider();
+    const chatwootFetch = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ payload: [] }), {
+          headers: { "Content-Type": "application/json" },
+          status: 200,
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 42 }), {
+          headers: { "Content-Type": "application/json" },
+          status: 200,
+        }),
+      );
+    const conversationProvider = new ChatwootConversationProvider({
+      accountId: 7,
+      accessToken: "runtime-test-token",
+      baseUrl: "https://chat.example.com",
+      fetch: chatwootFetch,
+    });
     await expect(
       runWorkerOnce({
         auditStore: new PostgresAuditStore(database.sql),
@@ -124,13 +143,17 @@ describe("persistent service runtime", () => {
       }),
     ).resolves.toBe("processed");
 
-    expect(conversationProvider.replies).toEqual([
-      {
-        conversationId: "runtime-conversation",
-        idempotencyKey: `${deliveryKey}:reply`,
-        text: "Hello from Replywork.",
-      },
-    ]);
+    expect(chatwootFetch).toHaveBeenCalledTimes(2);
+    expect(String(chatwootFetch.mock.calls[1]?.[0])).toBe(
+      "https://chat.example.com/api/v1/accounts/7/conversations/19/messages",
+    );
+    expect(JSON.parse(String(chatwootFetch.mock.calls[1]?.[1]?.body)) as unknown).toEqual({
+      content: "Hello from Replywork.",
+      content_type: "text",
+      message_type: "outgoing",
+      private: false,
+      source_id: `${deliveryKey}:reply`,
+    });
 
     const [processedState] = await database.sql<
       { archivedMessages: number; auditEntries: number; queuedMessages: number }[]
