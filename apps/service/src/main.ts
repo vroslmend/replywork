@@ -1,4 +1,7 @@
+import { loadLocalEnvironment } from "./environment.js";
 import { startService } from "./runtime.js";
+
+loadLocalEnvironment();
 
 const app = await startService();
 

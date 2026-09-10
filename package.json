@@ -19,11 +19,13 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "start:service": "node apps/service/dist/main.js",
+    "start:worker:once": "node apps/service/dist/worker-main.js",
     "test": "vitest run",
     "test:db": "vitest run --config vitest.db.config.ts",
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false",
-    "verify": "prettier --check . && eslint . && tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false && vitest run"
+    "verify": "prettier --check . && eslint . && tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false && vitest run",
+    "worker:once": "tsx apps/service/src/worker-main.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

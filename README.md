@@ -68,6 +68,9 @@ pnpm test
 pnpm build
 ```
 
+`pnpm worker:once` processes at most one admitted delivery and then exits. It is intended for
+controlled integration work until a deployment needs a continuously polling worker.
+
 Copy `.env.example` to `.env` only when running an integration locally. Unit and contract tests do
 not read local credentials or make network requests.
 
