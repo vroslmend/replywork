@@ -1,12 +1,17 @@
-import type { ConversationEvent } from "@replywork/contracts";
-import type { DeliveryQueue, EnqueueResult } from "@replywork/core";
+import { conversationEventSchema, type ConversationEvent } from "@replywork/contracts";
+import type {
+  DeliveryQueue,
+  DeliveryQueueConsumer,
+  EnqueueResult,
+  QueuedDelivery,
+} from "@replywork/core";
 import type postgres from "postgres";
 
 export interface PgmqDeliveryQueueOptions {
   queueName?: string;
 }
 
-export class PgmqDeliveryQueue implements DeliveryQueue {
+export class PgmqDeliveryQueue implements DeliveryQueue, DeliveryQueueConsumer {
   readonly #queueName: string;
   readonly #sql: postgres.Sql;
 
@@ -68,5 +73,40 @@ export class PgmqDeliveryQueue implements DeliveryQueue {
 
       return "queued";
     });
+  }
+
+  async readOne(visibilityTimeoutSeconds: number): Promise<QueuedDelivery | null> {
+    const [message] = await this.#sql<{ event: unknown; messageId: string; readCount: number }[]>`
+      SELECT
+        msg_id::text AS "messageId",
+        read_ct::integer AS "readCount",
+        message AS event
+      FROM pgmq.read(${this.#queueName}, ${visibilityTimeoutSeconds}, 1)
+    `;
+
+    if (message === undefined) {
+      return null;
+    }
+
+    const event = conversationEventSchema.safeParse(message.event);
+    if (!event.success) {
+      throw new Error(`queue message ${message.messageId} failed validation`);
+    }
+
+    return {
+      event: event.data,
+      messageId: message.messageId,
+      readCount: message.readCount,
+    };
+  }
+
+  async archive(messageId: string): Promise<void> {
+    const [result] = await this.#sql<{ archived: boolean }[]>`
+      SELECT pgmq.archive(${this.#queueName}, ${messageId}::bigint) AS archived
+    `;
+
+    if (result?.archived !== true) {
+      throw new Error(`queue message ${messageId} could not be archived`);
+    }
   }
 }

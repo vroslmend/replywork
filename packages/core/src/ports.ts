@@ -13,6 +13,17 @@ export interface DeliveryQueue {
   enqueueOnce(event: ConversationEvent): Promise<EnqueueResult>;
 }
 
+export interface QueuedDelivery {
+  event: ConversationEvent;
+  messageId: string;
+  readCount: number;
+}
+
+export interface DeliveryQueueConsumer {
+  archive(messageId: string): Promise<void>;
+  readOne(visibilityTimeoutSeconds: number): Promise<QueuedDelivery | null>;
+}
+
 export interface CatalogCapability {
   searchCatalog(query: CatalogQuery): Promise<readonly CatalogItem[]>;
 }

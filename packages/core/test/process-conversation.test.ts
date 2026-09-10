@@ -19,10 +19,12 @@ describe("processConversation", () => {
   it("sends a reply with an action-specific idempotency key", async () => {
     const conversationProvider = new FakeConversationProvider();
 
-    await processConversation(event, {
-      conversationProvider,
-      responder: { decide: async () => ({ kind: "reply", text: "Hello." }) },
-    });
+    await expect(
+      processConversation(event, {
+        conversationProvider,
+        responder: { decide: async () => ({ kind: "reply", text: "Hello." }) },
+      }),
+    ).resolves.toBe("reply");
 
     expect(conversationProvider.replies).toEqual([
       {
@@ -36,16 +38,18 @@ describe("processConversation", () => {
   it("requests a handoff without sending a reply", async () => {
     const conversationProvider = new FakeConversationProvider();
 
-    await processConversation(event, {
-      conversationProvider,
-      responder: {
-        decide: async () => ({
-          context: { orderId: "order-1" },
-          kind: "handoff",
-          reason: "operator approval required",
-        }),
-      },
-    });
+    await expect(
+      processConversation(event, {
+        conversationProvider,
+        responder: {
+          decide: async () => ({
+            context: { orderId: "order-1" },
+            kind: "handoff",
+            reason: "operator approval required",
+          }),
+        },
+      }),
+    ).resolves.toBe("handoff");
 
     expect(conversationProvider.replies).toHaveLength(0);
     expect(conversationProvider.handoffs).toEqual([

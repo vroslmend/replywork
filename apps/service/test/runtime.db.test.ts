@@ -1,8 +1,15 @@
 import { afterAll, describe, expect, it } from "vitest";
 
-import { createDatabase, signChatwootPayload } from "@replywork/adapters";
+import {
+  createDatabase,
+  PgmqDeliveryQueue,
+  PostgresAuditStore,
+  signChatwootPayload,
+} from "@replywork/adapters";
+import { FakeConversationProvider } from "@replywork/testkit";
 
 import { createServiceRuntime } from "../src/runtime.js";
+import { runWorkerOnce } from "../src/worker.js";
 
 const defaultDatabaseUrl = "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
 const databaseUrl = process.env.REPLYWORK_TEST_DATABASE_URL ?? defaultDatabaseUrl;
@@ -44,6 +51,10 @@ afterAll(async () => {
   await database.sql`
     SELECT pgmq.delete('conversation_events', msg_id)
     FROM pgmq.q_conversation_events
+    WHERE message ->> 'deliveryKey' = ${deliveryKey}
+  `;
+  await database.sql`
+    DELETE FROM pgmq.a_conversation_events
     WHERE message ->> 'deliveryKey' = ${deliveryKey}
   `;
   await database.sql`
@@ -102,5 +113,46 @@ describe("persistent service runtime", () => {
     `;
 
     expect(state).toEqual({ auditEntries: 1, queuedMessages: 1, receipts: 1 });
+
+    const conversationProvider = new FakeConversationProvider();
+    await expect(
+      runWorkerOnce({
+        auditStore: new PostgresAuditStore(database.sql),
+        conversationProvider,
+        deliveryQueue: new PgmqDeliveryQueue(database.sql),
+        responder: { decide: async () => ({ kind: "reply", text: "Hello from Replywork." }) },
+      }),
+    ).resolves.toBe("processed");
+
+    expect(conversationProvider.replies).toEqual([
+      {
+        conversationId: "runtime-conversation",
+        idempotencyKey: `${deliveryKey}:reply`,
+        text: "Hello from Replywork.",
+      },
+    ]);
+
+    const [processedState] = await database.sql<
+      { archivedMessages: number; auditEntries: number; queuedMessages: number }[]
+    >`
+      SELECT
+        (
+          SELECT count(*)::integer
+          FROM pgmq.a_conversation_events
+          WHERE message ->> 'deliveryKey' = ${deliveryKey}
+        ) AS "archivedMessages",
+        (
+          SELECT count(*)::integer
+          FROM replywork.audit_entries
+          WHERE delivery_key = ${deliveryKey}
+        ) AS "auditEntries",
+        (
+          SELECT count(*)::integer
+          FROM pgmq.q_conversation_events
+          WHERE message ->> 'deliveryKey' = ${deliveryKey}
+        ) AS "queuedMessages"
+    `;
+
+    expect(processedState).toEqual({ archivedMessages: 1, auditEntries: 2, queuedMessages: 0 });
   });
 });

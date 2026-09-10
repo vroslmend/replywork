@@ -1,6 +1,6 @@
 import type { ConversationEvent } from "@replywork/contracts";
 
-import type { ConversationProvider, ConversationResponder } from "./ports.js";
+import type { ConversationProvider, ConversationResponder, ResponseDecision } from "./ports.js";
 
 export interface ProcessingDependencies {
   conversationProvider: ConversationProvider;
@@ -10,7 +10,7 @@ export interface ProcessingDependencies {
 export const processConversation = async (
   event: ConversationEvent,
   dependencies: ProcessingDependencies,
-): Promise<void> => {
+): Promise<ResponseDecision["kind"]> => {
   const decision = await dependencies.responder.decide(event);
 
   if (decision.kind === "reply") {
@@ -19,7 +19,7 @@ export const processConversation = async (
       idempotencyKey: `${event.deliveryKey}:reply`,
       text: decision.text,
     });
-    return;
+    return "reply";
   }
 
   await dependencies.conversationProvider.requestHandoff({
@@ -28,4 +28,6 @@ export const processConversation = async (
     idempotencyKey: `${event.deliveryKey}:handoff`,
     reason: decision.reason,
   });
+
+  return "handoff";
 };
