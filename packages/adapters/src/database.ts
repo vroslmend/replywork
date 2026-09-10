@@ -7,5 +7,6 @@ export const createDatabase = (databaseUrl: string) => {
   return {
     close: async (): Promise<void> => client.end(),
     db: drizzle(client),
+    sql: client,
   };
 };

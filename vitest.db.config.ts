@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 
-import { configDefaults, defineConfig } from "vitest/config";
+import { defineConfig } from "vitest/config";
 
 const fromRoot = (path: string): string => fileURLToPath(new URL(path, import.meta.url));
 
@@ -14,11 +14,7 @@ export default defineConfig({
     },
   },
   test: {
-    coverage: {
-      reporter: ["text", "html"],
-    },
-    exclude: [...configDefaults.exclude, "**/*.db.test.ts"],
-    include: ["apps/**/*.test.ts", "packages/**/*.test.ts"],
+    include: ["packages/**/*.db.test.ts"],
     restoreMocks: true,
   },
 });

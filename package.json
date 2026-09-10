@@ -18,6 +18,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:db": "vitest run --config vitest.db.config.ts",
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false",
     "verify": "prettier --check . && eslint . && tsc -b --pretty false && tsc -p tsconfig.test.json --pretty false && vitest run"

@@ -14,5 +14,10 @@
     },
     "types": ["node", "vitest/globals"]
   },
-  "include": ["apps/**/*.test.ts", "packages/**/*.test.ts", "vitest.config.ts"]
+  "include": [
+    "apps/**/*.test.ts",
+    "packages/**/*.test.ts",
+    "vitest.config.ts",
+    "vitest.db.config.ts"
+  ]
 }
