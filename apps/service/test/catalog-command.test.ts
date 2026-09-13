@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseCatalogArguments, requireLocalSeedDatabase } from "../src/catalog-command.js";
+import { parseCatalogArguments, requireLocalCatalogDatabase } from "../src/catalog-command.js";
 import { loadCatalogConfig } from "../src/config.js";
 
 describe("catalog command", () => {
@@ -42,13 +42,13 @@ describe("catalog command", () => {
     "postgres://127.0.0.1:54322/postgres",
     "postgresql://[::1]/replywork",
   ])("allows a local example seed at %s", (url) => {
-    expect(() => requireLocalSeedDatabase(url)).not.toThrow();
+    expect(() => requireLocalCatalogDatabase(url)).not.toThrow();
   });
 
   it.each([
     "postgresql://db.example.com/replywork",
     "postgresql://localhost/replywork?host=db.example.com",
   ])("rejects example seeding at %s", (url) => {
-    expect(() => requireLocalSeedDatabase(url)).toThrow();
+    expect(() => requireLocalCatalogDatabase(url)).toThrow();
   });
 });

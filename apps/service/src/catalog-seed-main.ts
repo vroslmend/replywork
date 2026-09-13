@@ -2,13 +2,13 @@ import { readFile } from "node:fs/promises";
 
 import { createDatabase } from "@replywork/adapters";
 
-import { requireLocalSeedDatabase } from "./catalog-command.js";
+import { requireLocalCatalogDatabase } from "./catalog-command.js";
 import { loadCatalogConfig } from "./config.js";
 import { loadLocalEnvironment } from "./environment.js";
 
 loadLocalEnvironment();
 const config = loadCatalogConfig(process.env);
-requireLocalSeedDatabase(config.DATABASE_URL);
+requireLocalCatalogDatabase(config.DATABASE_URL);
 const seed = await readFile(
   new URL("../../../supabase/seeds/catalog.example.sql", import.meta.url),
   "utf8",

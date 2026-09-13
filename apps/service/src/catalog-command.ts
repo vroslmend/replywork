@@ -17,11 +17,9 @@ export const parseCatalogArguments = (args: readonly string[]): CatalogQuery => 
   return catalogQuerySchema.parse({ limit: Number(values.limit), text: positionals.join(" ") });
 };
 
-export const requireLocalSeedDatabase = (databaseUrl: string): void => {
+export const requireLocalCatalogDatabase = (databaseUrl: string): void => {
   const url = new URL(databaseUrl);
   if (!["localhost", "127.0.0.1", "::1", "[::1]"].includes(url.hostname) || url.search !== "") {
-    throw new Error(
-      "Example catalog seeding requires a local database URL without query parameters",
-    );
+    throw new Error("This catalog command requires a local database URL without query parameters");
   }
 };

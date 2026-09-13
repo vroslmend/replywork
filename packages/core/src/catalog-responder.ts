@@ -52,27 +52,27 @@ export class CatalogResponder implements ConversationResponder {
   constructor(private readonly dependencies: CatalogResponderDependencies) {}
 
   async decide(event: ConversationEvent): Promise<ResponseDecision> {
-    const command = /^\/catalog(?:\s+([\s\S]*))?$/i.exec(event.message.text.trim());
+    return this.decideQuestion(event.message.text, event.deliveryKey);
+  }
+
+  async decideQuestion(question: string, deliveryKey: string): Promise<ResponseDecision> {
+    const command = /^\/catalog(?:\s+([\s\S]*))?$/i.exec(question.trim());
     let queryText = command?.[1] ?? "";
     let topic: "details" | "price" | "availability" = "details";
     if (command === null) {
       if (this.dependencies.interpreter === undefined) return this.handoff();
-      if (
-        event.message.text.trim().length === 0 ||
-        event.message.text.length > 2_000 ||
-        event.message.text.includes("\0")
-      ) {
+      if (question.trim().length === 0 || question.length > 2_000 || question.includes("\0")) {
         return this.clarify();
       }
       let request;
       try {
         request = catalogRequestSchema.parse(
-          await this.dependencies.interpreter.interpret(event.message.text),
+          await this.dependencies.interpreter.interpret(question),
         );
       } catch (error) {
         await this.dependencies.auditStore.append({
           at: (this.dependencies.now?.() ?? new Date()).toISOString(),
-          deliveryKey: event.deliveryKey,
+          deliveryKey,
           details: { capability: "catalog", operation: "interpret" },
           kind: "tool",
           outcome: "failed",
@@ -82,10 +82,10 @@ export class CatalogResponder implements ConversationResponder {
       const queryMentioned =
         request.query === null
           ? null
-          : normalizeMention(event.message.text).includes(normalizeMention(request.query));
+          : normalizeMention(question).includes(normalizeMention(request.query));
       await this.dependencies.auditStore.append({
         at: (this.dependencies.now?.() ?? new Date()).toISOString(),
-        deliveryKey: event.deliveryKey,
+        deliveryKey,
         details: {
           capability: "catalog",
           operation: "interpret",
@@ -137,7 +137,7 @@ export class CatalogResponder implements ConversationResponder {
     } catch (error) {
       await this.dependencies.auditStore.append({
         at: (this.dependencies.now?.() ?? new Date()).toISOString(),
-        deliveryKey: event.deliveryKey,
+        deliveryKey,
         details: { capability: "catalog", operation: "search" },
         kind: "tool",
         outcome: "failed",
@@ -147,7 +147,7 @@ export class CatalogResponder implements ConversationResponder {
 
     await this.dependencies.auditStore.append({
       at: (this.dependencies.now?.() ?? new Date()).toISOString(),
-      deliveryKey: event.deliveryKey,
+      deliveryKey,
       details: {
         capability: "catalog",
         operation: "search",

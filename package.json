@@ -13,6 +13,7 @@
   "packageManager": "pnpm@12.3.4",
   "scripts": {
     "build": "tsc -b --pretty false",
+    "catalog:ask": "tsx apps/service/src/catalog-question-main.ts",
     "catalog:eval": "tsx apps/service/src/catalog-evaluation-main.ts",
     "catalog:search": "tsx apps/service/src/catalog-main.ts",
     "catalog:seed": "tsx apps/service/src/catalog-seed-main.ts",

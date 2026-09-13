@@ -153,6 +153,10 @@ uses the same interpreter as the worker and can start with a single `--case`; no
 or database is needed. Offline runner tests verify scoring and failure handling, not live model
 accuracy.
 
+The [terminal question command](catalog-questions.md) also exercises ordinary questions through
+interpretation, the local approved catalog and stored-fact rendering. It prints decisions without
+sending replies or changing conversation state.
+
 References: [structured output](https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data),
 [Google provider](https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai),
 [request limits](https://ai-sdk.dev/docs/reference/ai-sdk-core/generate-text).
