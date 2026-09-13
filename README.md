@@ -74,6 +74,11 @@ controlled integration work until a deployment needs a continuously polling work
 Copy `.env.example` to `.env` only when running an integration locally. Unit and contract tests do
 not read local credentials or make network requests.
 
+For an existing instance or the optional self-hosted example, see the
+[Chatwoot integration guide](docs/chatwoot.md). The example follows upstream documentation but has
+not been booted or verified against a live instance. Chatwoot is not required for offline
+development.
+
 ## Security
 
 Transactional actions stay behind deterministic validation, identity checks, and explicit
