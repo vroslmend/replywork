@@ -40,14 +40,17 @@ in an existing project does not isolate its quota. Create the key privately in
 [AI Studio](https://aistudio.google.com/api-keys) and never paste it into chat or commit it.
 
 This uses the same Google adapter and prompt as the worker, without Chatwoot, Docker or PostgreSQL.
-Calls run sequentially, once per selected case, with the adapter's 10-second timeout and no SDK
-retries. The runner stops on the first provider or invalid-output error. Semantic mismatches do not
-stop the run. Changing the dataset is capped at 30 cases by validation.
+Calls run sequentially, once per selected case, with a five-second pause between cases, the
+adapter's 10-second timeout and no SDK retries. The runner stops on the first provider or
+invalid-output error. Semantic mismatches do not stop the run. Spacing reduces bursts but does not
+guarantee compliance with your account's quota. Changing the dataset is capped at 30 cases by
+validation.
 
 The JSON report includes the configured model ID, completion timestamp, expected and actual
 requests, per-case timings, passed/mismatched/error counts and cases not run. Progress goes to
-stderr. Raw provider errors, request headers and credentials are not included. Results are not
-written to the repository; keep any saved run under ignored `_local/`, not as a public progress log.
+stderr. Provider errors include an HTTP status code when available, never raw error messages,
+request headers or credentials. Results are not written to the repository; keep any saved run under
+ignored `_local/`, not as a public progress log.
 
 A case passes only when kind, topic and query match the expected request. Query comparison ignores
 case, Unicode compatibility differences and repeated whitespace. A broader query such as `tote`

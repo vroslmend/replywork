@@ -70,6 +70,7 @@ export interface CatalogEvaluationResult {
   expected: CatalogRequest;
   actual: CatalogRequest | null;
   durationMs: number;
+  errorHttpStatus?: number;
 }
 
 const normalizeQuery = (text: string | null): string | null =>
@@ -81,14 +82,24 @@ export const runCatalogEvaluation = async (
     interpreter: CatalogInterpreter;
     now?: () => number;
     onResult?: (result: CatalogEvaluationResult) => void;
+    intervalMs?: number;
   },
 ) => {
   const cases = parseCatalogEvaluationCases(input);
+  const intervalMs = z
+    .number()
+    .int()
+    .min(0)
+    .max(60_000)
+    .parse(dependencies.intervalMs ?? 0);
   const results: CatalogEvaluationResult[] = [];
   const now = dependencies.now ?? (() => performance.now());
   for (const testCase of cases) {
+    if (results.length > 0 && intervalMs > 0)
+      await new Promise<void>((resolve) => setTimeout(resolve, intervalMs));
     const startedAt = now();
     let actual: CatalogRequest | null = null;
+    let errorHttpStatus: number | undefined;
     let status: CatalogEvaluationResult["status"];
     try {
       actual = catalogRequestSchema.parse(
@@ -100,9 +111,14 @@ export const runCatalogEvaluation = async (
         normalizeQuery(actual.query) === normalizeQuery(testCase.expected.query)
           ? "passed"
           : "mismatch";
-    } catch {
+    } catch (error) {
       // Provider errors can contain request headers. Reports deliberately omit raw errors.
       status = "error";
+      if (typeof error === "object" && error !== null && "statusCode" in error) {
+        const code = error.statusCode;
+        if (typeof code === "number" && Number.isInteger(code) && code >= 100 && code <= 599)
+          errorHttpStatus = code;
+      }
     }
     const result = {
       id: testCase.id,
@@ -110,6 +126,7 @@ export const runCatalogEvaluation = async (
       actual,
       expected: testCase.expected,
       durationMs: Math.max(0, Math.round(now() - startedAt)),
+      ...(errorHttpStatus === undefined ? {} : { errorHttpStatus }),
     };
     results.push(result);
     dependencies.onResult?.(result);

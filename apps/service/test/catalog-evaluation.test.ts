@@ -221,4 +221,54 @@ describe("catalog evaluation scoring", () => {
     });
     expect(interpreter.interpret).toHaveBeenCalledTimes(1);
   });
+
+  it("reports only a bounded HTTP status, not provider messages or headers", async () => {
+    const interpreter = {
+      interpret: vi.fn<CatalogInterpreter["interpret"]>().mockRejectedValue({
+        statusCode: 429,
+        message: "synthetic-private-provider-message",
+        responseHeaders: { authorization: "synthetic-private-header" },
+      }),
+    };
+    const report = await runCatalogEvaluation(cases, { interpreter });
+    expect(report.results[0]).toMatchObject({ status: "error", errorHttpStatus: 429 });
+    expect(report.notRun).toBe(2);
+    expect(JSON.stringify(report)).not.toContain("synthetic-private");
+  });
+
+  it.each(["429", -1, 600, 429.5])("omits invalid HTTP status %s", async (statusCode) => {
+    const interpreter = {
+      interpret: vi.fn<CatalogInterpreter["interpret"]>().mockRejectedValue({ statusCode }),
+    };
+    const report = await runCatalogEvaluation(cases, { interpreter });
+    expect(report.results[0]).not.toHaveProperty("errorHttpStatus");
+  });
+
+  it("spaces subsequent calls without delaying the first one", async () => {
+    vi.useFakeTimers();
+    try {
+      const interpreter = {
+        interpret: vi.fn<CatalogInterpreter["interpret"]>().mockResolvedValue(cases[0]!.expected),
+      };
+      const pending = runCatalogEvaluation(cases.slice(0, 2), { interpreter, intervalMs: 5000 });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(interpreter.interpret).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(4999);
+      expect(interpreter.interpret).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(1);
+      await pending;
+      expect(interpreter.interpret).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it.each([-1, 60_001, 1.5])(
+    "rejects an invalid interval before model calls: %s",
+    async (intervalMs) => {
+      const interpreter = { interpret: vi.fn<CatalogInterpreter["interpret"]>() };
+      await expect(runCatalogEvaluation(cases, { interpreter, intervalMs })).rejects.toThrow();
+      expect(interpreter.interpret).not.toHaveBeenCalled();
+    },
+  );
 });

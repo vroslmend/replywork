@@ -30,11 +30,15 @@ const main = async (): Promise<void> => {
   loadLocalEnvironment();
   const config = loadCatalogEvaluationConfig(process.env);
   const report = await runCatalogEvaluation(cases, {
+    intervalMs: 5_000,
     interpreter: createGoogleCatalogInterpreter({
       apiKey: config.GOOGLE_GENERATIVE_AI_API_KEY,
       modelId: config.REPLYWORK_CATALOG_MODEL,
     }),
-    onResult: ({ id, status }) => process.stderr.write(`${id}: ${status}\n`),
+    onResult: ({ id, status, errorHttpStatus }) =>
+      process.stderr.write(
+        `${id}: ${status}${errorHttpStatus === undefined ? "" : ` (HTTP ${errorHttpStatus})`}\n`,
+      ),
   });
   process.stdout.write(
     `${JSON.stringify({ mode: "live", modelId: config.REPLYWORK_CATALOG_MODEL, completedAt: new Date().toISOString(), ...report }, null, 2)}\n`,

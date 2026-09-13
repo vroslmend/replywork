@@ -81,6 +81,23 @@ describe("natural catalog decisions", () => {
     });
   });
 
+  it("includes both recorded price and availability for a combined-topic details request", async () => {
+    const { responder, catalog } = setup({
+      kind: "search",
+      query: "canvas tote",
+      topic: "details",
+    });
+    const decision = await responder.decide(
+      eventFor("What is the price and availability of the canvas tote?"),
+    );
+    expect(decision.kind).toBe("reply");
+    if (decision.kind !== "reply") throw new Error("Expected a catalog reply");
+    expect(decision.text).toContain("PKR 1,800.00");
+    expect(decision.text).toContain("unavailable");
+    expect(decision.text).toContain(product.description);
+    expect(catalog.searchCatalog).toHaveBeenCalledWith({ limit: 5, text: "canvas tote" });
+  });
+
   it.each(["price", "availability"] as const)(
     "clarifies ambiguous %s matches instead of choosing a product",
     async (topic) => {

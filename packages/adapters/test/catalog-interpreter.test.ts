@@ -91,6 +91,24 @@ describe("AI SDK catalog interpreter", () => {
     expect(model.doGenerateCalls).toHaveLength(1);
   });
 
+  it("includes the observed combined-topic regression in the classification instructions", async () => {
+    const request = { kind: "search", query: "canvas tote", topic: "details" };
+    const model = modelFor(JSON.stringify(request));
+    await expect(
+      new AiCatalogInterpreter(model).interpret(
+        "What is the price and availability of the canvas tote?",
+      ),
+    ).resolves.toEqual(request);
+    const instruction = model.doGenerateCalls[0]?.prompt.find(
+      (message) => message.role === "system",
+    );
+    expect(instruction?.content).toContain("For price and availability together, choose details");
+    expect(instruction?.content).toContain(
+      '"What is the price and availability of the canvas tote?" -> search, query "canvas tote", topic details.',
+    );
+    // This guards prompt construction, not live model accuracy; the synthetic evaluation checks that.
+  });
+
   it.each(["", " ", "a".repeat(2001), "tote\0"])(
     "rejects invalid input without a model call",
     async (text) => {
