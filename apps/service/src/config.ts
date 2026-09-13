@@ -27,6 +27,11 @@ const workerConfigSchema = z.discriminatedUnion("REPLYWORK_RESPONDER", [
     REPLYWORK_REPLY_TEXT: z.string().trim().min(1),
   }),
   workerBaseSchema.extend({ REPLYWORK_RESPONDER: z.literal("catalog") }),
+  workerBaseSchema.extend({
+    REPLYWORK_RESPONDER: z.literal("catalog-natural"),
+    GOOGLE_GENERATIVE_AI_API_KEY: z.string().trim().min(1),
+    REPLYWORK_CATALOG_MODEL: z.string().trim().min(1),
+  }),
 ]);
 
 export type ServiceConfig = z.infer<typeof serviceConfigSchema>;

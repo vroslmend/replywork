@@ -70,3 +70,18 @@ These checks cannot cancel a provider request already in flight. The current bou
 controlled worker, not per-conversation concurrency coordination. Proactive operator replies also
 need an explicit pause; outgoing Chatwoot events are filtered at admission. See
 [conversation controls](conversation-control.md).
+
+## Bounded interpretation
+
+Natural catalog mode injects a `CatalogInterpreter` port into the existing responder. The Gemini
+adapter uses AI SDK structured output for one message, with no tools or conversation history. Its
+request cannot carry answer prose or business writes. The core validates the shape and requires the
+query to be mentioned in the input, then uses the same read-only catalog and deterministic renderer.
+Ambiguous price/availability matches ask for a product name or ID. Unsupported classification
+requests handoff; interpretation failures leave the delivery queued for retry.
+
+The model sees customer message text, not catalog results or permission state. Interpretation
+kind/topic are audited without prompt or extracted query. Fixed replies remain the default;
+command-only catalog mode does not invoke an interpreter. Local boundary tests are not proof of live
+semantic accuracy. See
+[ordinary-language catalog questions](catalog.md#ordinary-language-questions).

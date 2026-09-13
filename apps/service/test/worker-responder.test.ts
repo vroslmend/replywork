@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { ConversationEvent } from "@replywork/contracts";
-import type { AuditStore, CatalogCapability } from "@replywork/core";
+import type { AuditStore, CatalogCapability, CatalogInterpreter } from "@replywork/core";
 
 import { loadWorkerConfig } from "../src/config.js";
 import { createWorkerResponder } from "../src/worker-responder.js";
@@ -70,5 +70,52 @@ describe("worker responder selection", () => {
   it("rejects unknown modes and a fixed worker without reply text", () => {
     expect(() => loadWorkerConfig({ ...environment, REPLYWORK_RESPONDER: "ai" })).toThrow();
     expect(() => loadWorkerConfig({ ...environment, REPLYWORK_REPLY_TEXT: "" })).toThrow();
+  });
+
+  it("selects natural catalog mode only with explicit model configuration and an interpreter", async () => {
+    const ports = dependencies();
+    const config = loadWorkerConfig({
+      ...environment,
+      REPLYWORK_RESPONDER: "catalog-natural",
+      GOOGLE_GENERATIVE_AI_API_KEY: "synthetic-key",
+      REPLYWORK_CATALOG_MODEL: "synthetic-model",
+    });
+    expect(() => createWorkerResponder(config, ports)).toThrow("requires an interpreter");
+    const interpreter = {
+      interpret: vi
+        .fn<CatalogInterpreter["interpret"]>()
+        .mockResolvedValue({ kind: "search", query: "tote", topic: "price" }),
+    };
+    const responder = createWorkerResponder(config, { ...ports, interpreter });
+    expect(
+      (await responder.decide({ ...event, message: { ...event.message, text: "Price of tote?" } }))
+        .kind,
+    ).toBe("reply");
+    expect(interpreter.interpret).toHaveBeenCalledTimes(1);
+    await expect(responder.decide({ ...event, accountId: "8" })).rejects.toThrow("account");
+    expect(interpreter.interpret).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not enable an injected interpreter in command-only catalog mode", async () => {
+    const ports = dependencies();
+    const interpreter = { interpret: vi.fn<CatalogInterpreter["interpret"]>() };
+    const responder = createWorkerResponder(
+      loadWorkerConfig({ ...environment, REPLYWORK_RESPONDER: "catalog" }),
+      { ...ports, interpreter },
+    );
+    expect(
+      (await responder.decide({ ...event, message: { ...event.message, text: "Price of tote?" } }))
+        .kind,
+    ).toBe("handoff");
+    expect(interpreter.interpret).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { GOOGLE_GENERATIVE_AI_API_KEY: "", REPLYWORK_CATALOG_MODEL: "synthetic-model" },
+    { GOOGLE_GENERATIVE_AI_API_KEY: "synthetic-key", REPLYWORK_CATALOG_MODEL: "" },
+  ])("rejects missing natural catalog credentials/configuration", (fields) => {
+    expect(() =>
+      loadWorkerConfig({ ...environment, REPLYWORK_RESPONDER: "catalog-natural", ...fields }),
+    ).toThrow();
   });
 });

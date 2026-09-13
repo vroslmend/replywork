@@ -15,11 +15,11 @@ been booted. The pin is a reproducible integration target, not a production secu
 Review release notes and security updates before deploying it.
 
 The `worker:once` command sends a fixed configured reply by default. Optional catalog mode answers
-explicit `/catalog` requests; see the [catalog guide](catalog.md). Neither mode performs order
-actions or model-based decisions. The handoff adapter can write a private note, optionally assign a
-team and reopen a conversation. Handoff saves a durable pause; manual takeover uses the
-[conversation controls](conversation-control.md). Live provider behavior is still unverified; do not
-run this worker against an unattended customer inbox.
+explicit `/catalog` requests. Opt-in `catalog-natural` mode adds structured Gemini interpretation;
+see the [catalog guide](catalog.md). No mode performs order actions. The handoff adapter can write a
+private note, optionally assign a team and reopen a conversation. Handoff saves a durable pause;
+manual takeover uses the [conversation controls](conversation-control.md). Live provider behavior is
+still unverified; do not run this worker against an unattended customer inbox.
 
 ## Optional self-hosted example
 
@@ -91,17 +91,19 @@ unsigned requests, resolve its version or configuration; do not disable signatur
 
 Configure the existing root `.env.example` fields:
 
-| Field                       | Value                                                                          |
-| --------------------------- | ------------------------------------------------------------------------------ |
-| `CHATWOOT_ACCOUNT_ID`       | Numeric account ID for the test inbox                                          |
-| `CHATWOOT_API_ACCESS_TOKEN` | Profile token for a user with access to that account and inbox                 |
-| `CHATWOOT_BASE_URL`         | URL reachable by the Replywork worker; `http://localhost:3001` for the example |
-| `CHATWOOT_HANDOFF_TEAM_ID`  | Optional team in that account; leave blank otherwise                           |
-| `CHATWOOT_WEBHOOK_SECRET`   | Secret returned for this account webhook                                       |
-| `DATABASE_URL`              | Replywork PostgreSQL connection with the repository migration applied          |
-| `PORT`                      | Replywork service port; defaults to `3000`                                     |
-| `REPLYWORK_REPLY_TEXT`      | Fixed text for the controlled reply check                                      |
-| `REPLYWORK_RESPONDER`       | `fixed` (default) or `catalog`; reply text is required only for fixed mode     |
+| Field                          | Value                                                                                         |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `CHATWOOT_ACCOUNT_ID`          | Numeric account ID for the test inbox                                                         |
+| `CHATWOOT_API_ACCESS_TOKEN`    | Profile token for a user with access to that account and inbox                                |
+| `CHATWOOT_BASE_URL`            | URL reachable by the Replywork worker; `http://localhost:3001` for the example                |
+| `CHATWOOT_HANDOFF_TEAM_ID`     | Optional team in that account; leave blank otherwise                                          |
+| `CHATWOOT_WEBHOOK_SECRET`      | Secret returned for this account webhook                                                      |
+| `DATABASE_URL`                 | Replywork PostgreSQL connection with the repository migration applied                         |
+| `PORT`                         | Replywork service port; defaults to `3000`                                                    |
+| `REPLYWORK_REPLY_TEXT`         | Fixed text for the controlled reply check                                                     |
+| `REPLYWORK_RESPONDER`          | `fixed` (default), `catalog` or `catalog-natural`; reply text is required only for fixed mode |
+| `GOOGLE_GENERATIVE_AI_API_KEY` | Google API key; required only for `catalog-natural`                                           |
+| `REPLYWORK_CATALOG_MODEL`      | Explicit structured-output model ID; required only for `catalog-natural`                      |
 
 Run from the repository root so the entrypoints read its `.env`:
 
@@ -122,8 +124,9 @@ and preserve the original body and signature headers through any proxy.
 Before calling the integration verified, check signed admission, a visible reply, invalid-signature
 rejection, duplicate inbound delivery, API failure and worker retry, and handoff
 note/assignment/status against the chosen instance. Handoff needs a responder that chooses that
-action; catalog mode routes unsupported requests to handoff, while fixed mode does not. Operator
-takeover after handoff now pauses automation durably. Before a proactive human reply, use the
+action; command-only catalog mode routes unsupported requests to handoff, while fixed mode does not.
+Natural catalog mode also needs separate evaluation of the chosen model's routing. Operator takeover
+after handoff now pauses automation durably. Before a proactive human reply, use the
 [pause command](conversation-control.md); outgoing operator messages do not automatically pause
 Replywork. Verify pause and explicit resume against the chosen inbox as part of the live check.
 

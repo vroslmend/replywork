@@ -1,4 +1,5 @@
 import {
+  createGoogleCatalogInterpreter,
   ChatwootConversationProvider,
   createDatabase,
   PgmqDeliveryQueue,
@@ -33,6 +34,14 @@ export const runConfiguredWorkerOnce = async (config: WorkerConfig): Promise<Wor
         responder: createWorkerResponder(config, {
           auditStore,
           catalog: new PostgresCatalog(database.sql),
+          ...(config.REPLYWORK_RESPONDER === "catalog-natural"
+            ? {
+                interpreter: createGoogleCatalogInterpreter({
+                  apiKey: config.GOOGLE_GENERATIVE_AI_API_KEY,
+                  modelId: config.REPLYWORK_CATALOG_MODEL,
+                }),
+              }
+            : {}),
         }),
       },
       { visibilityTimeoutSeconds: config.WORKER_VISIBILITY_TIMEOUT_SECONDS },

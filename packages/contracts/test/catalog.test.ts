@@ -1,8 +1,25 @@
 import { describe, expect, it } from "vitest";
 
-import { catalogItemSchema, catalogQuerySchema } from "@replywork/contracts";
+import { catalogItemSchema, catalogQuerySchema, catalogRequestSchema } from "@replywork/contracts";
 
 describe("catalog contracts", () => {
+  it("validates and trims a structured catalog search", () => {
+    expect(catalogRequestSchema.parse({ kind: "search", query: " tote ", topic: "price" })).toEqual(
+      { kind: "search", query: "tote", topic: "price" },
+    );
+  });
+  it.each([
+    { kind: "search", query: null, topic: "price" },
+    { kind: "search", query: "tote", topic: null },
+    { kind: "clarify", query: "tote", topic: null },
+    { kind: "handoff", query: null, topic: "price" },
+    { kind: "order", query: "tote", topic: "price" },
+    { kind: "search", query: "tote", topic: "discount" },
+    { kind: "search", query: "a".repeat(201), topic: "details" },
+    { kind: "search", query: "tote", topic: "details", reply: "invented" },
+  ])("rejects unsupported or contradictory interpretation %j", (request) => {
+    expect(() => catalogRequestSchema.parse(request)).toThrow();
+  });
   it("trims a bounded query", () => {
     expect(catalogQuerySchema.parse({ limit: 5, text: "  Canvas tote  " })).toEqual({
       limit: 5,

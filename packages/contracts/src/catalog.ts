@@ -21,3 +21,21 @@ export const catalogQuerySchema = z.object({
 
 export type CatalogItem = z.infer<typeof catalogItemSchema>;
 export type CatalogQuery = z.infer<typeof catalogQuerySchema>;
+
+// Flat output shape for provider structured generation; cross-field rules are checked locally.
+export const catalogRequestSchema = z
+  .strictObject({
+    kind: z.enum(["search", "clarify", "handoff"]),
+    query: catalogQuerySchema.shape.text.nullable(),
+    topic: z.enum(["details", "price", "availability"]).nullable(),
+  })
+  .superRefine((request, context) => {
+    const valid =
+      request.kind === "search"
+        ? request.query !== null && request.topic !== null
+        : request.query === null && request.topic === null;
+    if (!valid)
+      context.addIssue({ code: "custom", message: "Only a search may contain a query and topic" });
+  });
+
+export type CatalogRequest = z.infer<typeof catalogRequestSchema>;

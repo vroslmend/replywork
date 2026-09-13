@@ -87,8 +87,9 @@ availability and descriptions. It supports bounded text search and exact product
 inventing missing products or changing business data. A local command and synthetic examples are
 available in the [catalog guide](docs/catalog.md). Set `REPLYWORK_RESPONDER=catalog` to let the
 worker answer explicit `/catalog` requests from recorded facts and hand off other requests. Fixed
-replies remain the default; natural-language interpretation is not implemented. Handoff pauses
-automation until an operator explicitly resumes it. See the
+replies remain the default. Opt-in `catalog-natural` mode uses Gemini to extract a bounded catalog
+request, then builds the answer from stored facts. Its routing quality still needs live evaluation.
+Handoff pauses automation until an operator explicitly resumes it. See the
 [conversation control guide](docs/conversation-control.md) for behavior and limits.
 
 ## Security

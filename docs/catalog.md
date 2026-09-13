@@ -95,8 +95,58 @@ Database worker tests exercise signed admission, the real catalog adapter, outgo
 no matches, private handoff requests, provider failure/retry and the account boundary. Chatwoot HTTP
 responses remain controlled in these tests; a live instance is still unverified.
 
-This explicit command is an integration boundary for controlled testing, not the intended final
-customer interface. Natural-language selection, real catalog import, live commerce availability and
-automatic detection of proactive operator takeover are separate work. Handoff now saves a durable
-pause; trusted operators can also pause and resume using the
+This explicit command remains an integration boundary for controlled testing. Real catalog import,
+live commerce availability and automatic detection of proactive operator takeover are separate work.
+Handoff now saves a durable pause; trusted operators can also pause and resume using the
 [conversation controls](conversation-control.md). Do not enable it on an unattended customer inbox.
+
+## Ordinary-language questions
+
+`REPLYWORK_RESPONDER=catalog-natural` adds a Gemini interpreter through AI SDK Core. Set
+`GOOGLE_GENERATIVE_AI_API_KEY` and an explicit `REPLYWORK_CATALOG_MODEL` in the root `.env` or
+worker environment. There is no default model, credential reuse or automatic switch from fixed or
+command-only mode. The chosen model must support structured output and be available to your account.
+
+The interpreter receives only the current customer message, not account IDs, conversation history,
+credentials or catalog results. Enabling this mode sends that text to Google's API. Check the
+provider's data terms, quota and billing configuration before using it with customer messages.
+Offline tests do not read local keys or contact Google.
+
+The model returns one validated request: search with a product query and topic (`details`, `price`
+or `availability`), clarify, or handoff. It has no tools and cannot supply customer-facing prose,
+prices, stock, orders or permissions. Local code requires the search term to be mentioned in the
+message, ignoring case and repeated whitespace, before querying approved catalog records.
+Unmentioned terms produce clarification instead of an inferred product search.
+
+Intended questions include "How much is the canvas tote?", "Do you have the pocket notebook?" and
+"Tell me about the stoneware mug". Price and availability replies use recorded values and explicitly
+avoid checkout totals or stock guarantees. Multiple matching products produce a name/ID
+clarification for those topics rather than selecting one. Details requests list the bounded matches.
+No match still produces the existing no-match reply.
+
+The prompt directs greetings and missing product references to clarification, and order, payment,
+shipping, discount, refund, policy and human-help requests to handoff. These are intended routing
+rules, not proof of semantic accuracy or resistance to every prompt injection. Deterministic safety
+comes from the read-only capability, output validation and fact renderer, not prompt wording. There
+is no conversation memory, synonym expansion or follow-up resolution. Clarification requires another
+self-contained message; unsupported actions are not implemented.
+
+Existing `/catalog` requests bypass the model in both catalog modes. Other messages are limited to
+2,000 characters before interpretation. Each interpretation uses one model call, a 10-second
+timeout, a 512-token output limit and no SDK retries. Errors propagate to the queue worker; they are
+not treated as a successful answer or silently replaced with a regex interpretation.
+
+The delivery audit records interpretation kind/topic, mention-check outcome and lookup product
+IDs/counts, not customer text, extracted query or model response. Queue admission still stores the
+normalized message as before. SDK telemetry is disabled; managed model tracing is not configured.
+Interpretation may repeat on worker retry. Paused conversations do not call the interpreter.
+
+Tests cover schema validation, mention checks, grounded rendering, clarification, malformed model
+output, provider failure and Google's actual SDK with a controlled transport. Database tests cover
+signed admission through the real catalog and worker, including suppression after handoff. They do
+not establish real model routing quality or live Chatwoot behavior. Evaluate the selected model with
+synthetic messages, including mixed requests and adversarial inputs, before enabling customer use.
+
+References: [structured output](https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data),
+[Google provider](https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai),
+[request limits](https://ai-sdk.dev/docs/reference/ai-sdk-core/generate-text).

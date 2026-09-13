@@ -10,8 +10,10 @@
     }
   },
   "dependencies": {
+    "@ai-sdk/google": "4.0.69",
     "@replywork/contracts": "workspace:*",
     "@replywork/core": "workspace:*",
+    "ai": "7.0.99",
     "drizzle-orm": "0.45.2",
     "postgres": "3.4.9",
     "zod": "4.5.4"

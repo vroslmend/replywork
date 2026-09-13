@@ -2,6 +2,7 @@ import {
   CatalogResponder,
   type AuditStore,
   type CatalogCapability,
+  type CatalogInterpreter,
   type ConversationResponder,
 } from "@replywork/core";
 
@@ -9,11 +10,21 @@ import type { WorkerConfig } from "./config.js";
 
 export const createWorkerResponder = (
   config: WorkerConfig,
-  dependencies: { auditStore: AuditStore; catalog: CatalogCapability },
+  dependencies: {
+    auditStore: AuditStore;
+    catalog: CatalogCapability;
+    interpreter?: CatalogInterpreter;
+  },
 ): ConversationResponder => {
   const responder: ConversationResponder =
-    config.REPLYWORK_RESPONDER === "catalog"
-      ? new CatalogResponder(dependencies)
+    config.REPLYWORK_RESPONDER !== "fixed"
+      ? new CatalogResponder({
+          auditStore: dependencies.auditStore,
+          catalog: dependencies.catalog,
+          ...(config.REPLYWORK_RESPONDER === "catalog-natural"
+            ? { interpreter: requireInterpreter(dependencies.interpreter) }
+            : {}),
+        })
       : { decide: async () => ({ kind: "reply", text: config.REPLYWORK_REPLY_TEXT }) };
 
   return {
@@ -24,4 +35,9 @@ export const createWorkerResponder = (
       return responder.decide(event);
     },
   };
+};
+
+const requireInterpreter = (interpreter: CatalogInterpreter | undefined): CatalogInterpreter => {
+  if (interpreter === undefined) throw new Error("Natural catalog mode requires an interpreter");
+  return interpreter;
 };

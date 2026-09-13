@@ -1,6 +1,7 @@
 import type {
   CatalogItem,
   CatalogQuery,
+  CatalogRequest,
   ConversationEvent,
   DraftOrder,
   DraftOrderInput,
@@ -26,6 +27,10 @@ export interface DeliveryQueueConsumer {
 
 export interface CatalogCapability {
   searchCatalog(query: CatalogQuery): Promise<readonly CatalogItem[]>;
+}
+
+export interface CatalogInterpreter {
+  interpret(text: string): Promise<CatalogRequest>;
 }
 
 export interface OrderCapability {
