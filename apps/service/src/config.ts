@@ -12,15 +12,22 @@ const optionalPositiveInteger = z.preprocess(
   z.coerce.number().int().positive().optional(),
 );
 
-const workerConfigSchema = z.object({
+const workerBaseSchema = z.object({
   CHATWOOT_ACCOUNT_ID: z.coerce.number().int().positive(),
   CHATWOOT_API_ACCESS_TOKEN: z.string().min(1),
   CHATWOOT_BASE_URL: z.url(),
   CHATWOOT_HANDOFF_TEAM_ID: optionalPositiveInteger,
   DATABASE_URL: z.url(),
-  REPLYWORK_REPLY_TEXT: z.string().trim().min(1),
   WORKER_VISIBILITY_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(30),
 });
+
+const workerConfigSchema = z.discriminatedUnion("REPLYWORK_RESPONDER", [
+  workerBaseSchema.extend({
+    REPLYWORK_RESPONDER: z.literal("fixed"),
+    REPLYWORK_REPLY_TEXT: z.string().trim().min(1),
+  }),
+  workerBaseSchema.extend({ REPLYWORK_RESPONDER: z.literal("catalog") }),
+]);
 
 export type ServiceConfig = z.infer<typeof serviceConfigSchema>;
 export type WorkerConfig = z.infer<typeof workerConfigSchema>;
@@ -39,4 +46,7 @@ export const loadServiceConfig = (environment: NodeJS.ProcessEnv): ServiceConfig
   serviceConfigSchema.parse(environment);
 
 export const loadWorkerConfig = (environment: NodeJS.ProcessEnv): WorkerConfig =>
-  workerConfigSchema.parse(environment);
+  workerConfigSchema.parse({
+    ...environment,
+    REPLYWORK_RESPONDER: environment.REPLYWORK_RESPONDER ?? "fixed",
+  });

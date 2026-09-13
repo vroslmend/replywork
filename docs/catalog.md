@@ -64,6 +64,37 @@ real PostgreSQL matching, ordering, approval filtering, unavailability, literal 
 matches and stored-data constraints. Its isolated synthetic records are removed after the tests;
 existing catalog records are not changed.
 
-The conversation worker still uses its configured fixed reply. Connecting catalog results to a
-responder, selecting products from natural language, importing a real catalog and confirming live
-commerce availability are separate integrations.
+## Conversation responder
+
+Set `REPLYWORK_RESPONDER=catalog` in the worker environment to enable `CatalogResponder`.
+Fixed-reply mode remains the default and requires `REPLYWORK_REPLY_TEXT`; catalog mode does not.
+Both modes still need Chatwoot API credentials for provider writes. The standalone search command
+does not.
+
+A visitor message such as `/catalog canvas tote` searches at most five approved products and replies
+with their recorded name, ID, price, availability and description. No match produces an explicit
+no-match reply. An empty or oversized catalog query produces usage guidance without searching. Other
+messages request human handoff rather than being interpreted as catalog questions.
+
+The responder validates adapter results and records successful or failed lookups in the delivery's
+audit history. Successful records contain product IDs and result count, not the query or
+conversation text. Database, validation or audit errors propagate to the worker so the delivery is
+not archived as a successful reply. A retry can record another lookup; the audit is an attempt
+history, not one entry per conversation.
+
+Price conversion uses explicit ISO 4217 minor-unit values for EUR, GBP, JPY, KWD, PKR and USD. Other
+currencies are displayed as raw minor units until their conversion is added and verified. Locale
+display precision is not used to infer the stored unit. See the
+[official currency list](https://www.six-group.com/en/products-services/financial-information/market-reference-data/data-standards.html).
+
+The configured worker rejects a delivery from a different Chatwoot account before searching or
+writing to the provider. This account check does not establish the visitor's identity or authorize
+an order lookup.
+
+Database worker tests exercise signed admission, the real catalog adapter, outgoing reply requests,
+no matches, private handoff requests, provider failure/retry and the account boundary. Chatwoot HTTP
+responses remain controlled in these tests; a live instance is still unverified.
+
+This explicit command is an integration boundary for controlled testing, not the intended final
+customer interface. Natural-language selection, real catalog import, live commerce availability and
+human-takeover pause/resume are separate work. Do not enable it on an unattended customer inbox.

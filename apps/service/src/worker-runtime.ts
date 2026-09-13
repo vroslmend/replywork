@@ -3,18 +3,21 @@ import {
   createDatabase,
   PgmqDeliveryQueue,
   PostgresAuditStore,
+  PostgresCatalog,
 } from "@replywork/adapters";
 
 import type { WorkerConfig } from "./config.js";
 import { runWorkerOnce, type WorkerRunResult } from "./worker.js";
+import { createWorkerResponder } from "./worker-responder.js";
 
 export const runConfiguredWorkerOnce = async (config: WorkerConfig): Promise<WorkerRunResult> => {
   const database = createDatabase(config.DATABASE_URL);
+  const auditStore = new PostgresAuditStore(database.sql);
 
   try {
     return await runWorkerOnce(
       {
-        auditStore: new PostgresAuditStore(database.sql),
+        auditStore,
         conversationProvider: new ChatwootConversationProvider({
           accountId: config.CHATWOOT_ACCOUNT_ID,
           accessToken: config.CHATWOOT_API_ACCESS_TOKEN,
@@ -24,9 +27,10 @@ export const runConfiguredWorkerOnce = async (config: WorkerConfig): Promise<Wor
             : { handoffTeamId: config.CHATWOOT_HANDOFF_TEAM_ID }),
         }),
         deliveryQueue: new PgmqDeliveryQueue(database.sql),
-        responder: {
-          decide: async () => ({ kind: "reply", text: config.REPLYWORK_REPLY_TEXT }),
-        },
+        responder: createWorkerResponder(config, {
+          auditStore,
+          catalog: new PostgresCatalog(database.sql),
+        }),
       },
       { visibilityTimeoutSeconds: config.WORKER_VISIBILITY_TIMEOUT_SECONDS },
     );

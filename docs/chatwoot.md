@@ -14,10 +14,11 @@ The Compose example follows the upstream Docker guide and pins Chatwoot `v4.17.1
 been booted. The pin is a reproducible integration target, not a production security recommendation.
 Review release notes and security updates before deploying it.
 
-The current `worker:once` command sends a fixed configured reply. It does not perform catalog
-queries, order actions or model-based decisions. The handoff adapter can write a private note,
-optionally assign a team and reopen a conversation. Pausing automation after human takeover is not
-implemented; do not run this worker against a live customer inbox.
+The `worker:once` command sends a fixed configured reply by default. Optional catalog mode answers
+explicit `/catalog` requests; see the [catalog guide](catalog.md). Neither mode performs order
+actions or model-based decisions. The handoff adapter can write a private note, optionally assign a
+team and reopen a conversation. Pausing automation after human takeover is not implemented; do not
+run this worker against a live customer inbox.
 
 ## Optional self-hosted example
 
@@ -99,6 +100,7 @@ Configure the existing root `.env.example` fields:
 | `DATABASE_URL`              | Replywork PostgreSQL connection with the repository migration applied          |
 | `PORT`                      | Replywork service port; defaults to `3000`                                     |
 | `REPLYWORK_REPLY_TEXT`      | Fixed text for the controlled reply check                                      |
+| `REPLYWORK_RESPONDER`       | `fixed` (default) or `catalog`; reply text is required only for fixed mode     |
 
 Run from the repository root so the entrypoints read its `.env`:
 
@@ -119,8 +121,8 @@ and preserve the original body and signature headers through any proxy.
 Before calling the integration verified, check signed admission, a visible reply, invalid-signature
 rejection, duplicate inbound delivery, API failure and worker retry, and handoff
 note/assignment/status against the chosen instance. Handoff needs a responder that chooses that
-action; the fixed-reply entrypoint does not exercise it. Operator takeover needs a separate
-pause/resume implementation.
+action; catalog mode routes unsupported requests to handoff, while fixed mode does not. Operator
+takeover needs a separate pause/resume implementation.
 
 Outgoing deduplication currently checks the returned message list for a deterministic `source_id`
 before sending. The release source accepts that field, but live preservation and message pagination

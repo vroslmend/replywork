@@ -84,8 +84,10 @@ development.
 The read-only PostgreSQL catalog lookup returns approved product records with stored prices,
 availability and descriptions. It supports bounded text search and exact product IDs, without
 inventing missing products or changing business data. A local command and synthetic examples are
-available in the [catalog guide](docs/catalog.md). The conversation worker does not use this
-capability yet.
+available in the [catalog guide](docs/catalog.md). Set `REPLYWORK_RESPONDER=catalog` to let the
+worker answer explicit `/catalog` requests from recorded facts and hand off other requests. Fixed
+replies remain the default; natural-language interpretation and takeover pause/resume are not
+implemented.
 
 ## Security
 

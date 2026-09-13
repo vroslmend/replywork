@@ -42,3 +42,14 @@ repeats a request.
 
 An outgoing reply becomes a public Chatwoot message. A handoff becomes a private operator note,
 optional team assignment, and an open conversation. Business policy remains outside the provider.
+
+## Read-only catalog decisions
+
+The optional catalog responder accepts explicit `/catalog` requests through the existing worker. It
+queries the `CatalogCapability` port, validates returned records, audits product IDs and result
+count, and builds a reply from stored facts. Unsupported requests become handoff requests; no model
+selects tools or grants permissions. Fixed replies remain the default worker mode.
+
+The PostgreSQL adapter reads only approved catalog records. Search and response generation do not
+reserve stock or perform commerce writes. The worker binds processing to its configured Chatwoot
+account, but visitor identity and human-takeover pause/resume need separate implementation.

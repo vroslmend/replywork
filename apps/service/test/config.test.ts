@@ -43,6 +43,7 @@ describe("loadWorkerConfig", () => {
       CHATWOOT_HANDOFF_TEAM_ID: undefined,
       DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:54322/postgres",
       REPLYWORK_REPLY_TEXT: "Thanks for your message.",
+      REPLYWORK_RESPONDER: "fixed",
       WORKER_VISIBILITY_TIMEOUT_SECONDS: 45,
     });
   });
