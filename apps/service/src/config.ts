@@ -25,6 +25,16 @@ const workerConfigSchema = z.object({
 export type ServiceConfig = z.infer<typeof serviceConfigSchema>;
 export type WorkerConfig = z.infer<typeof workerConfigSchema>;
 
+const catalogConfigSchema = z.object({
+  DATABASE_URL: z
+    .url()
+    .refine((value) => ["postgres:", "postgresql:"].includes(new URL(value).protocol)),
+});
+
+export const loadCatalogConfig = (
+  environment: NodeJS.ProcessEnv,
+): z.infer<typeof catalogConfigSchema> => catalogConfigSchema.parse(environment);
+
 export const loadServiceConfig = (environment: NodeJS.ProcessEnv): ServiceConfig =>
   serviceConfigSchema.parse(environment);
 

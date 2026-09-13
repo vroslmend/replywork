@@ -79,6 +79,14 @@ For an existing instance or the optional self-hosted example, see the
 not been booted or verified against a live instance. Chatwoot is not required for offline
 development.
 
+## Catalog
+
+The read-only PostgreSQL catalog lookup returns approved product records with stored prices,
+availability and descriptions. It supports bounded text search and exact product IDs, without
+inventing missing products or changing business data. A local command and synthetic examples are
+available in the [catalog guide](docs/catalog.md). The conversation worker does not use this
+capability yet.
+
 ## Security
 
 Transactional actions stay behind deterministic validation, identity checks, and explicit

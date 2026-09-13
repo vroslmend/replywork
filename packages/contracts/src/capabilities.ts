@@ -1,16 +1,3 @@
-export interface CatalogItem {
-  available: boolean;
-  currency: string;
-  id: string;
-  name: string;
-  priceMinor: number;
-}
-
-export interface CatalogQuery {
-  limit: number;
-  text: string;
-}
-
 export interface OrderLineInput {
   productId: string;
   quantity: number;

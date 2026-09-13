@@ -13,6 +13,8 @@
   "packageManager": "pnpm@12.3.4",
   "scripts": {
     "build": "tsc -b --pretty false",
+    "catalog:search": "tsx apps/service/src/catalog-main.ts",
+    "catalog:seed": "tsx apps/service/src/catalog-seed-main.ts",
     "clean": "tsc -b --clean",
     "dev:service": "tsx apps/service/src/main.ts",
     "format": "prettier --write .",
