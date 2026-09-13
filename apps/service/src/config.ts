@@ -42,6 +42,14 @@ export const loadCatalogConfig = (
   environment: NodeJS.ProcessEnv,
 ): z.infer<typeof catalogConfigSchema> => catalogConfigSchema.parse(environment);
 
+const conversationControlSchema = catalogConfigSchema.extend({
+  CHATWOOT_ACCOUNT_ID: z.coerce.number().int().positive(),
+});
+
+export const loadConversationControlConfig = (
+  environment: NodeJS.ProcessEnv,
+): z.infer<typeof conversationControlSchema> => conversationControlSchema.parse(environment);
+
 export const loadServiceConfig = (environment: NodeJS.ProcessEnv): ServiceConfig =>
   serviceConfigSchema.parse(environment);
 

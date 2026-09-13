@@ -4,6 +4,7 @@ import {
   PgmqDeliveryQueue,
   PostgresAuditStore,
   PostgresCatalog,
+  PostgresConversationAutomation,
 } from "@replywork/adapters";
 
 import type { WorkerConfig } from "./config.js";
@@ -17,7 +18,9 @@ export const runConfiguredWorkerOnce = async (config: WorkerConfig): Promise<Wor
   try {
     return await runWorkerOnce(
       {
+        accountId: String(config.CHATWOOT_ACCOUNT_ID),
         auditStore,
+        conversationAutomation: new PostgresConversationAutomation(database.sql),
         conversationProvider: new ChatwootConversationProvider({
           accountId: config.CHATWOOT_ACCOUNT_ID,
           accessToken: config.CHATWOOT_API_ACCESS_TOKEN,

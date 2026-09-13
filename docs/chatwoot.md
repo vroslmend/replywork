@@ -17,8 +17,9 @@ Review release notes and security updates before deploying it.
 The `worker:once` command sends a fixed configured reply by default. Optional catalog mode answers
 explicit `/catalog` requests; see the [catalog guide](catalog.md). Neither mode performs order
 actions or model-based decisions. The handoff adapter can write a private note, optionally assign a
-team and reopen a conversation. Pausing automation after human takeover is not implemented; do not
-run this worker against a live customer inbox.
+team and reopen a conversation. Handoff saves a durable pause; manual takeover uses the
+[conversation controls](conversation-control.md). Live provider behavior is still unverified; do not
+run this worker against an unattended customer inbox.
 
 ## Optional self-hosted example
 
@@ -122,7 +123,9 @@ Before calling the integration verified, check signed admission, a visible reply
 rejection, duplicate inbound delivery, API failure and worker retry, and handoff
 note/assignment/status against the chosen instance. Handoff needs a responder that chooses that
 action; catalog mode routes unsupported requests to handoff, while fixed mode does not. Operator
-takeover needs a separate pause/resume implementation.
+takeover after handoff now pauses automation durably. Before a proactive human reply, use the
+[pause command](conversation-control.md); outgoing operator messages do not automatically pause
+Replywork. Verify pause and explicit resume against the chosen inbox as part of the live check.
 
 Outgoing deduplication currently checks the returned message list for a deterministic `source_id`
 before sending. The release source accepts that field, but live preservation and message pagination

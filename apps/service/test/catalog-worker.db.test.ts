@@ -6,6 +6,7 @@ import {
   PgmqDeliveryQueue,
   PostgresAuditStore,
   PostgresCatalog,
+  PostgresConversationAutomation,
   signChatwootPayload,
 } from "@replywork/adapters";
 
@@ -26,6 +27,7 @@ const run = `${process.pid}_${Date.now()}`;
 const queueName = `catalog_worker_test_${run}`;
 const deliveryPrefix = `chatwoot:delivery:catalog-worker-${run}-`;
 const productId = `catalog-worker-product-${run}`;
+const conversationPrefix = `catalog-worker-conversation-${run}-`;
 const database = createDatabase(databaseUrl);
 const queue = new PgmqDeliveryQueue(database.sql, { queueName });
 const auditStore = new PostgresAuditStore(database.sql);
@@ -55,6 +57,7 @@ afterEach(async () => {
 afterAll(async () => {
   try {
     await app.close();
+    await database.sql`DELETE FROM replywork.conversation_automation WHERE strpos(conversation_id, ${conversationPrefix}) = 1`;
     await database.sql`DELETE FROM replywork.audit_entries WHERE strpos(delivery_key, ${deliveryPrefix}) = 1`;
     await database.sql`DELETE FROM replywork.delivery_receipts WHERE strpos(delivery_key, ${deliveryPrefix}) = 1`;
     await database.sql`DELETE FROM replywork.catalog_items WHERE id = ${productId}`;
@@ -64,14 +67,14 @@ afterAll(async () => {
   }
 });
 
-const admit = async (suffix: string, text: string, accountId = "7") => {
+const admit = async (suffix: string, text: string, accountId = "7", conversation = suffix) => {
   const timestamp = String(Math.floor(Date.now() / 1000));
   const deliveryId = `catalog-worker-${run}-${suffix}`;
   const payload = JSON.stringify({
     account: { id: accountId },
     content: text,
     content_type: "text",
-    conversation: { id: "19", inbox_id: "3" },
+    conversation: { id: `${conversationPrefix}${conversation}`, inbox_id: "3" },
     created_at: timestamp,
     event: "message_created",
     id: `${run}-${suffix}`,
@@ -105,7 +108,9 @@ const transport = () =>
   );
 const worker = (chatwootFetch: typeof fetch) =>
   runWorkerOnce({
+    accountId: String(config.CHATWOOT_ACCOUNT_ID),
     auditStore,
+    conversationAutomation: new PostgresConversationAutomation(database.sql),
     deliveryQueue: queue,
     conversationProvider: new ChatwootConversationProvider({
       accountId: config.CHATWOOT_ACCOUNT_ID,
@@ -207,5 +212,38 @@ describe("catalog conversation worker", () => {
       { kind: "delivery", outcome: "succeeded" },
       { kind: "delivery", outcome: "failed" },
     ]);
+  });
+
+  it("pauses before a failed handoff, suppresses later work and resumes only new deliveries", async () => {
+    const key = await admit("control-handoff", "Where is my order?", "7", "control");
+    const fetch = transport();
+    fetch.mockResolvedValueOnce(new Response(JSON.stringify({ payload: [] }), { status: 200 }));
+    fetch.mockResolvedValueOnce(new Response("unavailable", { status: 503 }));
+    await expect(worker(fetch)).rejects.toMatchObject({ status: 503 });
+    const controls = new PostgresConversationAutomation(database.sql);
+    const scope = {
+      provider: "chatwoot" as const,
+      accountId: "7",
+      conversationId: `${conversationPrefix}control`,
+    };
+    expect((await controls.getStatus(scope)).paused).toBe(true);
+    const ignoredKey = await admit("control-ignored", `/catalog ${productId}`, "7", "control");
+    await expect(worker(fetch)).resolves.toBe("processed");
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect((await audits(ignoredKey)).map((entry) => entry.kind)).toEqual(["delivery", "delivery"]);
+    expect((await audits(ignoredKey))[1]).toMatchObject({ outcome: "ignored" });
+    await database.sql`UPDATE ${database.sql(`pgmq.q_${queueName}`)} SET vt = now() WHERE message ->> 'deliveryKey' = ${key}`;
+    await expect(worker(fetch)).resolves.toBe("processed");
+    expect((await controls.getStatus(scope)).paused).toBe(true);
+    const backlogKey = await admit("control-backlog", `/catalog ${productId}`, "7", "control");
+    await controls.setPaused(scope, false);
+    const callCount = fetch.mock.calls.length;
+    await expect(worker(fetch)).resolves.toBe("processed");
+    expect(fetch).toHaveBeenCalledTimes(callCount);
+    expect((await audits(backlogKey))[1]).toMatchObject({ kind: "delivery", outcome: "ignored" });
+    await admit("control-new", `/catalog ${productId}`, "7", "control");
+    await expect(worker(fetch)).resolves.toBe("processed");
+    expect(fetch).toHaveBeenCalledTimes(callCount + 2);
+    expect((await controls.getStatus(scope)).paused).toBe(false);
   });
 });

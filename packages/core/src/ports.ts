@@ -70,3 +70,29 @@ export type ResponseDecision =
 export interface ConversationResponder {
   decide(event: ConversationEvent): Promise<ResponseDecision>;
 }
+
+export interface ConversationScope {
+  provider: ConversationEvent["provider"];
+  accountId: string;
+  conversationId: string;
+}
+
+export interface HandoffIntent {
+  deliveryKey: string;
+  context: Readonly<Record<string, unknown>>;
+  reason: string;
+}
+
+export interface ConversationAutomationState {
+  paused: boolean;
+  discard: boolean;
+  handoff: HandoffIntent | null;
+}
+
+export interface ConversationAutomation {
+  inspect(event: ConversationEvent): Promise<ConversationAutomationState>;
+  pauseForHandoff(
+    event: ConversationEvent,
+    decision: Extract<ResponseDecision, { kind: "handoff" }>,
+  ): Promise<boolean>;
+}

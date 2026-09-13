@@ -5,6 +5,7 @@ import {
   createDatabase,
   PgmqDeliveryQueue,
   PostgresAuditStore,
+  PostgresConversationAutomation,
   signChatwootPayload,
 } from "@replywork/adapters";
 
@@ -136,7 +137,9 @@ describe("persistent service runtime", () => {
     });
     await expect(
       runWorkerOnce({
+        accountId: "7",
         auditStore: new PostgresAuditStore(database.sql),
+        conversationAutomation: new PostgresConversationAutomation(database.sql),
         conversationProvider,
         deliveryQueue: new PgmqDeliveryQueue(database.sql),
         responder: { decide: async () => ({ kind: "reply", text: "Hello from Replywork." }) },

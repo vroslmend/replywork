@@ -2,13 +2,16 @@ import type { ConversationEvent } from "@replywork/contracts";
 import {
   processConversation,
   type AuditStore,
+  type ConversationAutomation,
   type ConversationProvider,
   type ConversationResponder,
   type DeliveryQueueConsumer,
-  type ResponseDecision,
+  type ProcessingResult,
 } from "@replywork/core";
 
 export interface WorkerDependencies {
+  accountId: string;
+  conversationAutomation: ConversationAutomation;
   conversationProvider: ConversationProvider;
   responder: ConversationResponder;
 }
@@ -16,7 +19,12 @@ export interface WorkerDependencies {
 export const handleQueuedConversation = async (
   event: ConversationEvent,
   dependencies: WorkerDependencies,
-): Promise<ResponseDecision["kind"]> => processConversation(event, dependencies);
+): Promise<ProcessingResult> => {
+  if (event.accountId !== dependencies.accountId) {
+    throw new Error("Delivery account does not match the configured worker account");
+  }
+  return processConversation(event, dependencies);
+};
 
 export interface QueueWorkerDependencies extends WorkerDependencies {
   auditStore: AuditStore;
@@ -44,7 +52,7 @@ export const runWorkerOnce = async (
     return "idle";
   }
 
-  let kind: ResponseDecision["kind"];
+  let kind: ProcessingResult;
   try {
     kind = await handleQueuedConversation(delivery.event, dependencies);
   } catch (error) {
@@ -61,9 +69,12 @@ export const runWorkerOnce = async (
   await dependencies.auditStore.append({
     at: (options.now?.() ?? new Date()).toISOString(),
     deliveryKey: delivery.event.deliveryKey,
-    details: { attempt: delivery.readCount },
-    kind,
-    outcome: "succeeded",
+    details: {
+      attempt: delivery.readCount,
+      ...(kind === "ignored" ? { reason: "conversation-control" } : {}),
+    },
+    kind: kind === "ignored" ? "delivery" : kind,
+    outcome: kind === "ignored" ? "ignored" : "succeeded",
   });
   await dependencies.deliveryQueue.archive(delivery.messageId);
 

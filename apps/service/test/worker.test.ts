@@ -7,7 +7,7 @@ import type {
   DeliveryQueueConsumer,
   QueuedDelivery,
 } from "@replywork/core";
-import { FakeConversationProvider } from "@replywork/testkit";
+import { FakeConversationProvider, MemoryConversationAutomation } from "@replywork/testkit";
 
 import { runWorkerOnce } from "../src/worker.js";
 
@@ -59,7 +59,9 @@ describe("runWorkerOnce", () => {
 
     await expect(
       runWorkerOnce({
+        accountId: "1",
         auditStore,
+        conversationAutomation: new MemoryConversationAutomation(),
         conversationProvider: new FakeConversationProvider(),
         deliveryQueue,
         responder: { decide: async () => ({ kind: "reply", text: "Hello." }) },
@@ -78,7 +80,9 @@ describe("runWorkerOnce", () => {
     await expect(
       runWorkerOnce(
         {
+          accountId: "1",
           auditStore,
+          conversationAutomation: new MemoryConversationAutomation(),
           conversationProvider,
           deliveryQueue,
           responder: { decide: async () => ({ kind: "reply", text: "Hello." }) },
@@ -109,7 +113,9 @@ describe("runWorkerOnce", () => {
     await expect(
       runWorkerOnce(
         {
+          accountId: "1",
           auditStore,
+          conversationAutomation: new MemoryConversationAutomation(),
           conversationProvider: new FakeConversationProvider(),
           deliveryQueue,
           responder: { decide: async () => Promise.reject(failure) },
@@ -128,5 +134,66 @@ describe("runWorkerOnce", () => {
         outcome: "failed",
       },
     ]);
+  });
+
+  it("audits and archives suppressed deliveries without provider writes", async () => {
+    const auditStore = new MemoryAuditStore();
+    const conversationAutomation = new MemoryConversationAutomation();
+    await conversationAutomation.pauseForHandoff(
+      { ...event, deliveryKey: "takeover" },
+      { kind: "handoff", reason: "operator", context: {} },
+    );
+    const conversationProvider = new FakeConversationProvider();
+    const deliveryQueue = new FakeDeliveryQueueConsumer(queuedDelivery);
+    await expect(
+      runWorkerOnce({
+        accountId: "1",
+        auditStore,
+        conversationAutomation,
+        conversationProvider,
+        deliveryQueue,
+        responder: {
+          decide: async () => {
+            throw new Error("must not run");
+          },
+        },
+      }),
+    ).resolves.toBe("processed");
+    expect(auditStore.entries[0]).toMatchObject({
+      kind: "delivery",
+      outcome: "ignored",
+      details: { attempt: 1, reason: "conversation-control" },
+    });
+    expect(deliveryQueue.archived).toEqual(["41"]);
+    expect(conversationProvider.replies).toHaveLength(0);
+  });
+
+  it("rejects a different account before retrying its saved handoff", async () => {
+    const auditStore = new MemoryAuditStore();
+    const conversationAutomation = new MemoryConversationAutomation();
+    await conversationAutomation.pauseForHandoff(event, {
+      kind: "handoff",
+      reason: "operator",
+      context: {},
+    });
+    const conversationProvider = new FakeConversationProvider();
+    const deliveryQueue = new FakeDeliveryQueueConsumer(queuedDelivery);
+    await expect(
+      runWorkerOnce({
+        accountId: "2",
+        auditStore,
+        conversationAutomation,
+        conversationProvider,
+        deliveryQueue,
+        responder: {
+          decide: async () => {
+            throw new Error("must not run");
+          },
+        },
+      }),
+    ).rejects.toThrow("account");
+    expect(conversationProvider.handoffs).toHaveLength(0);
+    expect(deliveryQueue.archived).toHaveLength(0);
+    expect(auditStore.entries[0]).toMatchObject({ kind: "delivery", outcome: "failed" });
   });
 });

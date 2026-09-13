@@ -16,6 +16,7 @@
     "catalog:search": "tsx apps/service/src/catalog-main.ts",
     "catalog:seed": "tsx apps/service/src/catalog-seed-main.ts",
     "clean": "tsc -b --clean",
+    "conversation:control": "tsx apps/service/src/conversation-main.ts",
     "dev:service": "tsx apps/service/src/main.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

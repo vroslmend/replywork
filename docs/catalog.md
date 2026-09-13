@@ -97,4 +97,6 @@ responses remain controlled in these tests; a live instance is still unverified.
 
 This explicit command is an integration boundary for controlled testing, not the intended final
 customer interface. Natural-language selection, real catalog import, live commerce availability and
-human-takeover pause/resume are separate work. Do not enable it on an unattended customer inbox.
+automatic detection of proactive operator takeover are separate work. Handoff now saves a durable
+pause; trusted operators can also pause and resume using the
+[conversation controls](conversation-control.md). Do not enable it on an unattended customer inbox.

@@ -52,4 +52,21 @@ selects tools or grants permissions. Fixed replies remain the default worker mod
 
 The PostgreSQL adapter reads only approved catalog records. Search and response generation do not
 reserve stock or perform commerce writes. The worker binds processing to its configured Chatwoot
-account, but visitor identity and human-takeover pause/resume need separate implementation.
+account, but visitor identity needs separate implementation.
+
+## Conversation control
+
+The worker checks durable conversation state before making a decision and again before sending a
+reply. Handoff saves a pause and its intent before calling the provider. The same delivery can retry
+that saved handoff without rerunning the responder; other deliveries are audited as ignored and
+archived. If the control store fails, processing fails rather than sending a reply.
+
+Trusted database operators can pause, resume or inspect a conversation. Resume clears the handoff
+intent and records a server-side admission cutoff, preventing older queued work from replaying.
+State is scoped by provider, account and conversation in the private PostgreSQL schema. There is no
+automatic expiry, public control endpoint or customer command that resumes automation.
+
+These checks cannot cancel a provider request already in flight. The current boundary is one
+controlled worker, not per-conversation concurrency coordination. Proactive operator replies also
+need an explicit pause; outgoing Chatwoot events are filtered at admission. See
+[conversation controls](conversation-control.md).
