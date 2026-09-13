@@ -147,6 +147,12 @@ signed admission through the real catalog and worker, including suppression afte
 not establish real model routing quality or live Chatwoot behavior. Evaluate the selected model with
 synthetic messages, including mixed requests and adversarial inputs, before enabling customer use.
 
+The [catalog evaluation](../evals/catalog/README.md) provides 24 synthetic questions and a manually
+invoked runner. `pnpm catalog:eval` previews without credentials or network calls. Explicit `--run`
+uses the same interpreter as the worker and can start with a single `--case`; no Chatwoot instance
+or database is needed. Offline runner tests verify scoring and failure handling, not live model
+accuracy.
+
 References: [structured output](https://ai-sdk.dev/docs/ai-sdk-core/generating-structured-data),
 [Google provider](https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai),
 [request limits](https://ai-sdk.dev/docs/reference/ai-sdk-core/generate-text).

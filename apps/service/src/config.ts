@@ -12,6 +12,15 @@ const optionalPositiveInteger = z.preprocess(
   z.coerce.number().int().positive().optional(),
 );
 
+const catalogModelSchema = z.object({
+  GOOGLE_GENERATIVE_AI_API_KEY: z.string().trim().min(1),
+  REPLYWORK_CATALOG_MODEL: z.string().trim().min(1),
+});
+
+export const loadCatalogEvaluationConfig = (
+  environment: NodeJS.ProcessEnv,
+): z.infer<typeof catalogModelSchema> => catalogModelSchema.parse(environment);
+
 const workerBaseSchema = z.object({
   CHATWOOT_ACCOUNT_ID: z.coerce.number().int().positive(),
   CHATWOOT_API_ACCESS_TOKEN: z.string().min(1),
@@ -29,8 +38,7 @@ const workerConfigSchema = z.discriminatedUnion("REPLYWORK_RESPONDER", [
   workerBaseSchema.extend({ REPLYWORK_RESPONDER: z.literal("catalog") }),
   workerBaseSchema.extend({
     REPLYWORK_RESPONDER: z.literal("catalog-natural"),
-    GOOGLE_GENERATIVE_AI_API_KEY: z.string().trim().min(1),
-    REPLYWORK_CATALOG_MODEL: z.string().trim().min(1),
+    ...catalogModelSchema.shape,
   }),
 ]);
 
