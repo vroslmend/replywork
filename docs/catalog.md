@@ -68,8 +68,8 @@ existing catalog records are not changed.
 
 Set `REPLYWORK_RESPONDER=catalog` in the worker environment to enable `CatalogResponder`.
 Fixed-reply mode remains the default and requires `REPLYWORK_REPLY_TEXT`; catalog mode does not.
-Both modes still need Chatwoot API credentials for provider writes. The standalone search command
-does not.
+Both modes still need configured inbox-provider credentials for provider writes. The standalone
+search command does not.
 
 A visitor message such as `/catalog canvas tote` searches at most five approved products and replies
 with their recorded name, ID, price, availability and description. No match produces an explicit
@@ -87,12 +87,12 @@ currencies are displayed as raw minor units until their conversion is added and 
 display precision is not used to infer the stored unit. See the
 [official currency list](https://www.six-group.com/en/products-services/financial-information/market-reference-data/data-standards.html).
 
-The configured worker rejects a delivery from a different Chatwoot account before searching or
+The configured worker rejects a delivery from a different provider account before searching or
 writing to the provider. This account check does not establish the visitor's identity or authorize
 an order lookup.
 
 Database worker tests exercise signed admission, the real catalog adapter, outgoing reply requests,
-no matches, private handoff requests, provider failure/retry and the account boundary. Chatwoot HTTP
+no matches, handoff requests, provider failure/retry and the account boundary. Provider HTTP
 responses remain controlled in these tests; a live instance is still unverified.
 
 This explicit command remains an integration boundary for controlled testing. Real catalog import,
@@ -144,8 +144,9 @@ Interpretation may repeat on worker retry. Paused conversations do not call the 
 Tests cover schema validation, mention checks, grounded rendering, clarification, malformed model
 output, provider failure and Google's actual SDK with a controlled transport. Database tests cover
 signed admission through the real catalog and worker, including suppression after handoff. They do
-not establish real model routing quality or live Chatwoot behavior. Evaluate the selected model with
-synthetic messages, including mixed requests and adversarial inputs, before enabling customer use.
+not establish real model routing quality or live inbox-provider behavior. Evaluate the selected
+model with synthetic messages, including mixed requests and adversarial inputs, before enabling
+customer use.
 
 The [catalog evaluation](../evals/catalog/README.md) provides 24 synthetic questions and a manually
 invoked runner. `pnpm catalog:eval` previews without credentials or network calls. Explicit `--run`

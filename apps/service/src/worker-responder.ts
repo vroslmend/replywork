@@ -6,7 +6,7 @@ import {
   type ConversationResponder,
 } from "@replywork/core";
 
-import type { WorkerConfig } from "./config.js";
+import { type WorkerConfig, workerAccountId } from "./config.js";
 
 export const createWorkerResponder = (
   config: WorkerConfig,
@@ -29,8 +29,8 @@ export const createWorkerResponder = (
 
   return {
     decide: async (event) => {
-      if (event.accountId !== String(config.CHATWOOT_ACCOUNT_ID)) {
-        throw new Error("Delivery account does not match the configured Chatwoot account");
+      if (event.accountId !== workerAccountId(config)) {
+        throw new Error("Delivery account does not match the configured provider account");
       }
       return responder.decide(event);
     },

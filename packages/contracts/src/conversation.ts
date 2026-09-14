@@ -11,7 +11,7 @@ export const conversationEventSchema = z.object({
     text: z.string().min(1),
   }),
   occurredAt: z.iso.datetime(),
-  provider: z.literal("chatwoot"),
+  provider: z.enum(["chatwoot", "crisp"]),
   sender: z.object({
     id: z.string().min(1),
   }),

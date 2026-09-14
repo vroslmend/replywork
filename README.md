@@ -6,12 +6,12 @@ Replywork is a customer operations service that sits behind a conversation inbox
 events, reduces them to a small internal contract, and passes accepted work to the business systems
 that can answer or act.
 
-Chatwoot owns the channels, conversation history, and operator inbox. Replywork owns the business
-rules, integration boundaries, approvals, and audit record.
+The configured inbox provider owns the channels, conversation history, and operator inbox. Replywork
+owns the business rules, integration boundaries, approvals, and audit record.
 
 ## Current boundary
 
-The repository currently implements and tests the durable Chatwoot delivery path:
+The repository implements and tests a durable delivery path for Chatwoot and Crisp:
 
 - HMAC verification over the original request body;
 - replay-window checks;
@@ -19,18 +19,18 @@ The repository currently implements and tests the durable Chatwoot delivery path
 - filtering for private, outgoing, and unsupported messages;
 - atomic receipt and queue admission in PostgreSQL;
 - a queue worker with visibility timeout, audit records, and archive-on-success behavior;
-- outgoing replies through the Chatwoot application API;
-- human handoff through a private note, optional team assignment, and an open conversation; and
+- outgoing replies through the configured provider API;
+- provider-appropriate human handoff with durable local automation pause; and
 - durable automation pause on handoff, with trusted pause/resume controls.
 
 The default test suite remains offline. Database tests exercise the complete signed webhook to
-outgoing API-request path against local PostgreSQL and a controlled HTTP boundary. A live Chatwoot
+outgoing API-request path against local PostgreSQL and a controlled HTTP boundary. A live inbox
 round trip remains an integration step rather than a claimed feature.
 
 ## Shape
 
 ```text
-Chatwoot
+Inbox provider
    |
 signed webhook
    |
@@ -79,6 +79,10 @@ For an existing instance or the optional self-hosted example, see the
 [Chatwoot integration guide](docs/chatwoot.md). The example follows upstream documentation but has
 not been booted or verified against a live instance. Chatwoot is not required for offline
 development.
+
+For the permanent Free-plan development path, see the [Crisp integration guide](docs/crisp.md). Its
+signed webhook, API reply, retry and handoff boundaries are locally tested; the live Crisp round
+trip is still pending.
 
 ## Catalog
 

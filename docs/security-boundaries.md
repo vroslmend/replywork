@@ -2,17 +2,17 @@
 
 ## Webhooks
 
-- Verify Chatwoot signatures against the original request bytes.
+- Verify provider signatures using the provider's documented signing format.
 - Reject missing, malformed, stale, or future timestamps outside the accepted window.
 - Use constant-time comparison for signatures of equal length.
-- Prefer Chatwoot's delivery identifier and derive a stable fallback when it is absent.
+- Derive a stable delivery key from the provider's delivery or message identifier.
 - Do not acknowledge work until its delivery has been admitted durably.
 
 ## Customer identity
 
-A valid webhook proves that Chatwoot sent the event. It does not prove that a person in the
-conversation owns a customer account or order. Sensitive lookups require a separate identity check
-appropriate to the connected business.
+A valid webhook proves that the configured provider sent the event. It does not prove that a person
+in the conversation owns a customer account or order. Sensitive lookups require a separate identity
+check appropriate to the connected business.
 
 ## Business actions
 

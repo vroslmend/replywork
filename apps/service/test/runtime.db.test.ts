@@ -45,6 +45,7 @@ const app = createServiceRuntime({
   DATABASE_URL: databaseUrl,
   NODE_ENV: "test",
   PORT: 3000,
+  REPLYWORK_PROVIDER: "chatwoot",
 });
 
 afterAll(async () => {

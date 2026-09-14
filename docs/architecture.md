@@ -7,7 +7,7 @@ provider.
 ```text
 channel
   |
-Chatwoot
+inbox provider
   |
 signed webhook
   |
@@ -26,22 +26,23 @@ API -> delivery receipt -> queue -> worker
 - `testkit` provides deterministic in-memory implementations for tests.
 - `service` owns HTTP and worker entrypoints.
 
-Chatwoot owns transport, conversation history, and the operator inbox. Replywork does not rebuild
-those features.
+The inbox provider owns transport, conversation history, and the operator inbox. Replywork does not
+rebuild those features.
 
 ## Admission before processing
 
-The webhook path verifies the signature over the original bytes, rejects stale requests, normalizes
+The webhook path verifies the provider's documented signature, rejects stale requests, normalizes
 supported events, and asks the delivery queue to enqueue the delivery once. A successful response
 means the work has been admitted, not completed.
 
 The persistent queue adapter commits the delivery receipt and queue message together. The worker
-archives a message only after recording its outcome. Chatwoot writes use a separate deterministic
-source ID derived from the admitted delivery, and the provider checks for that source ID before it
-repeats a request.
+archives a message only after recording its outcome. Provider writes use a deterministic message
+identifier derived from the admitted delivery, and the provider adapter checks for that identifier
+before repeating a request.
 
-An outgoing reply becomes a public Chatwoot message. A handoff becomes a private operator note,
-optional team assignment, and an open conversation. Business policy remains outside the provider.
+An outgoing reply becomes a public provider message. A handoff durably pauses Replywork and asks the
+provider to surface the conversation for an operator. Provider-specific details remain inside each
+adapter.
 
 ## Read-only catalog decisions
 
@@ -51,7 +52,7 @@ count, and builds a reply from stored facts. Unsupported requests become handoff
 selects tools or grants permissions. Fixed replies remain the default worker mode.
 
 The PostgreSQL adapter reads only approved catalog records. Search and response generation do not
-reserve stock or perform commerce writes. The worker binds processing to its configured Chatwoot
+reserve stock or perform commerce writes. The worker binds processing to its configured provider
 account, but visitor identity needs separate implementation.
 
 ## Conversation control
@@ -68,7 +69,7 @@ automatic expiry, public control endpoint or customer command that resumes autom
 
 These checks cannot cancel a provider request already in flight. The current boundary is one
 controlled worker, not per-conversation concurrency coordination. Proactive operator replies also
-need an explicit pause; outgoing Chatwoot events are filtered at admission. See
+need an explicit pause; outgoing provider events are filtered at admission. See
 [conversation controls](conversation-control.md).
 
 ## Bounded interpretation

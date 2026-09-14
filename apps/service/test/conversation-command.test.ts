@@ -7,6 +7,12 @@ describe("conversation control command", () => {
   it.each(["status", "pause", "resume"])("accepts %s for a positive conversation ID", (action) => {
     expect(parseConversationArguments([action, "19"])).toEqual({ action, conversationId: "19" });
   });
+  it("accepts a Crisp session ID", () => {
+    expect(parseConversationArguments(["status", "session_1234-abcd"])).toEqual({
+      action: "status",
+      conversationId: "session_1234-abcd",
+    });
+  });
   it.each(
     [
       [],
@@ -26,7 +32,11 @@ describe("conversation control command", () => {
         DATABASE_URL: "postgresql://localhost/postgres",
         CHATWOOT_ACCOUNT_ID: "7",
       }),
-    ).toEqual({ DATABASE_URL: "postgresql://localhost/postgres", CHATWOOT_ACCOUNT_ID: 7 });
+    ).toEqual({
+      DATABASE_URL: "postgresql://localhost/postgres",
+      CHATWOOT_ACCOUNT_ID: 7,
+      REPLYWORK_PROVIDER: "chatwoot",
+    });
     expect(() =>
       loadConversationControlConfig({
         DATABASE_URL: "https://example.com",

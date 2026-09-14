@@ -11,7 +11,10 @@ export const createServiceRuntime = (config: ServiceConfig): FastifyInstance => 
   const app = createServiceApp({
     deliveryQueue,
     logger: config.NODE_ENV !== "test",
-    webhookSecret: config.CHATWOOT_WEBHOOK_SECRET,
+    webhook:
+      config.REPLYWORK_PROVIDER === "crisp"
+        ? { provider: "crisp", secret: config.CRISP_WEBHOOK_SECRET }
+        : { provider: "chatwoot", secret: config.CHATWOOT_WEBHOOK_SECRET },
   });
 
   app.addHook("onClose", async () => database.close());

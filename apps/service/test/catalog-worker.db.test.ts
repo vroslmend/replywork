@@ -33,7 +33,10 @@ const database = createDatabase(databaseUrl);
 const queue = new PgmqDeliveryQueue(database.sql, { queueName });
 const auditStore = new PostgresAuditStore(database.sql);
 const secret = "catalog-worker-test-secret";
-const app = createServiceApp({ deliveryQueue: queue, webhookSecret: secret });
+const app = createServiceApp({
+  deliveryQueue: queue,
+  webhook: { provider: "chatwoot", secret },
+});
 const config = loadWorkerConfig({
   CHATWOOT_ACCOUNT_ID: "7",
   CHATWOOT_API_ACCESS_TOKEN: "test-token",
@@ -42,6 +45,7 @@ const config = loadWorkerConfig({
   DATABASE_URL: databaseUrl,
   REPLYWORK_RESPONDER: "catalog",
 });
+if (config.REPLYWORK_PROVIDER !== "chatwoot") throw new Error("expected Chatwoot test config");
 
 beforeAll(async () => {
   await database.sql`SELECT pgmq.create(${queueName})`;

@@ -9,8 +9,11 @@ const command = parseConversationArguments(process.argv.slice(2));
 const config = loadConversationControlConfig(process.env);
 const database = createDatabase(config.DATABASE_URL);
 const scope = {
-  provider: "chatwoot" as const,
-  accountId: String(config.CHATWOOT_ACCOUNT_ID),
+  provider: config.REPLYWORK_PROVIDER,
+  accountId:
+    config.REPLYWORK_PROVIDER === "crisp"
+      ? config.CRISP_WEBSITE_ID
+      : String(config.CHATWOOT_ACCOUNT_ID),
   conversationId: command.conversationId,
 };
 

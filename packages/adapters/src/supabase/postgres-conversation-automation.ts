@@ -9,7 +9,7 @@ import type postgres from "postgres";
 import { z } from "zod";
 
 const scopeSchema = z.object({
-  provider: z.literal("chatwoot"),
+  provider: z.enum(["chatwoot", "crisp"]),
   accountId: z.string().trim().min(1),
   conversationId: z.string().trim().min(1),
 });
