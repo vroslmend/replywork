@@ -1,8 +1,8 @@
 # Crisp integration
 
 Replywork supports signed Crisp plugin webhooks and operator replies through the REST API. The
-adapter follows the official API contract and is tested against controlled HTTP responses. A live
-inbox round trip has not yet been verified.
+adapter follows the official API contract and is tested against controlled HTTP responses. The
+development path has also been verified with a permanent Free workspace and private plugin token.
 
 ## Local development setup
 
@@ -34,6 +34,25 @@ Neither command automatically deploys anything.
 
 The plugin's Toolkit callback, settings and action URLs, widget definition, public listing and
 production token are not needed for this development check.
+
+## Verified development boundary
+
+The controlled live check used a localhost-only Crisp widget, a temporary Quick Tunnel, the one-shot
+worker and synthetic catalog data. It established that:
+
+- a signed customer `message:send` event reaches the durable queue and an API reply reaches Crisp;
+- a locally signed replay of the recorded event is admitted as a duplicate and sends no second
+  reply;
+- a controlled API `503` leaves the delivery queued, and a later run through the real API succeeds;
+- handoff marks the Crisp conversation unresolved and pauses local automation;
+- messages received while paused are archived without catalog work or automated replies;
+- operator-authored replies do not enter the customer automation queue; and
+- after an explicit resume, `catalog-natural` answers an ordinary-language question from the
+  approved PostgreSQL catalog and sends the stored-fact reply through Crisp.
+
+The duplicate check reproduced Crisp's signed payload locally; it was not an observed Crisp retry.
+Quick Tunnel URLs are temporary, the development token has a low daily limit, and `worker:once` does
+not provide continuous processing. None of this establishes production approval or uptime.
 
 ## Delivery and handoff behavior
 

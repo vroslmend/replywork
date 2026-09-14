@@ -24,8 +24,10 @@ The repository implements and tests a durable delivery path for Chatwoot and Cri
 - durable automation pause on handoff, with trusted pause/resume controls.
 
 The default test suite remains offline. Database tests exercise the complete signed webhook to
-outgoing API-request path against local PostgreSQL and a controlled HTTP boundary. A live inbox
-round trip remains an integration step rather than a claimed feature.
+outgoing API-request path against local PostgreSQL and a controlled HTTP boundary. A Crisp
+development workspace has also completed the live Free-plan reference path: inbound delivery, reply,
+retry, takeover suppression, resume, and a grounded catalog reply. This is development evidence, not
+a production hosting or uptime claim.
 
 ## Shape
 
@@ -81,8 +83,8 @@ not been booted or verified against a live instance. Chatwoot is not required fo
 development.
 
 For the permanent Free-plan development path, see the [Crisp integration guide](docs/crisp.md). Its
-signed webhook, API reply, retry and handoff boundaries are locally tested; the live Crisp round
-trip is still pending.
+signed webhook, API reply, retry and handoff boundaries are covered by offline tests and a
+controlled live development-workspace check.
 
 ## Catalog
 
