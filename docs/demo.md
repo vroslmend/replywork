@@ -1,8 +1,13 @@
 # Local sample: from question to reply
 
-The supported sample is a small synthetic storefront with Crisp's existing chat widget. Replywork
-remains the service behind the inbox, not a replacement inbox UI. Nothing is installed on your
-portfolio or a customer site, and no message is sent automatically.
+The supported sample is a synthetic catalog-and-handoff demonstration with Crisp's existing chat
+widget. Replywork remains the service behind the inbox, not a replacement inbox UI. Nothing is
+installed on your portfolio or a customer site, and no message is sent automatically.
+
+The three-step preview shows the relationship between a customer question, approved source and
+result. Its Canvas tote, Unavailable item and Human help buttons switch illustrative examples only:
+no database, model or provider request is made, and no session is paused. The actual Crisp test
+controls live below the preview and remain a separate, explicitly started path.
 
 ## Render the page only
 

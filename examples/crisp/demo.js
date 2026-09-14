@@ -7,6 +7,88 @@ let loading = false;
 let ready = false;
 let copyTimer;
 
+const previews = {
+  tote: {
+    question: "What is the price and availability of the canvas tote?",
+    routing: "Replywork identifies the product and the question.",
+    sourceLabel: "Approved source",
+    title: "Canvas tote",
+    id: "example-canvas-tote",
+    fields: [
+      ["Stored price", "PKR 1,800"],
+      ["Availability", "Listed available"],
+      ["Description", "Natural cotton bag with two handles."],
+    ],
+    sourceNote: "Read only. No checkout or stock write.",
+    resultLabel: "Stored-fact reply",
+    result: "The canvas tote is PKR 1,800; listed as available.",
+    resultNote: "Recorded availability, not a reservation.",
+  },
+  notebook: {
+    question: "Do you have the pocket notebook?",
+    routing: "The catalog record says this product is unavailable.",
+    sourceLabel: "Approved source",
+    title: "Pocket notebook",
+    id: "example-pocket-notebook",
+    fields: [
+      ["Stored price", "PKR 450"],
+      ["Availability", "Listed unavailable"],
+      ["Description", "A6 notebook with 64 plain pages."],
+    ],
+    sourceNote: "Unavailable records remain visible. No stock claim.",
+    resultLabel: "Stored-fact reply",
+    result: "The pocket notebook is listed as unavailable in the catalog.",
+    resultNote: "Recorded availability, not a stock reservation.",
+  },
+  handoff: {
+    question: "I need a human.",
+    routing: "The customer asks for a person. Automation stops for this conversation.",
+    sourceLabel: "Bounded decision",
+    title: "Human takeover",
+    id: "handoff-intent / example-session",
+    fields: [
+      ["Request", "Human help"],
+      ["Local state", "Automation paused"],
+      ["Inbox state", "Unresolved"],
+    ],
+    sourceNote: "No catalog lookup or business write.",
+    resultLabel: "Handoff decision",
+    result: "Leave this conversation with a human operator.",
+    resultNote: "A decision preview, not a customer-facing reply.",
+  },
+};
+
+const previewElements = {
+  question: document.querySelector("#preview-question"),
+  routing: document.querySelector("#preview-routing"),
+  sourceLabel: document.querySelector("#preview-source-label"),
+  title: document.querySelector("#preview-title"),
+  id: document.querySelector("#preview-id"),
+  sourceNote: document.querySelector("#preview-source-note"),
+  resultLabel: document.querySelector("#preview-result-label"),
+  result: document.querySelector("#preview-result"),
+  resultNote: document.querySelector("#preview-result-note"),
+};
+
+document.querySelectorAll("[data-preview]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const preview = previews[button.dataset.preview];
+    if (preview === undefined) return;
+    document.querySelectorAll("[data-preview]").forEach((option) => {
+      option.setAttribute("aria-pressed", String(option === button));
+    });
+    Object.entries(previewElements).forEach(([key, element]) => {
+      element.textContent = preview[key];
+    });
+    preview.fields.forEach(([label, value], index) => {
+      document.querySelector(`#preview-label-${index + 1}`).textContent = label;
+      document.querySelector(`#preview-value-${index + 1}`).textContent = value;
+    });
+    document.querySelector("#preview-status").textContent =
+      `${button.textContent} illustrative example selected.`;
+  });
+});
+
 const copy = async (text, label) => {
   window.clearTimeout(copyTimer);
   try {

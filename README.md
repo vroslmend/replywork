@@ -4,15 +4,17 @@
 
 <h1 align="center">replywork</h1>
 
-[![CI](https://github.com/vroslmend/replywork/actions/workflows/ci.yml/badge.svg)](https://github.com/vroslmend/replywork/actions/workflows/ci.yml)
+<div align="center">
+  <p>The work behind the reply.</p>
 
-The work behind the reply.
+  <p>Catalog answers from approved records,<br>with a durable path to human takeover.</p>
 
-Replywork answers catalog questions from approved records and hands unsupported work to a human. It
-sits behind a conversation inbox: Crisp or Chatwoot owns the widget and operator inbox; Replywork
-owns the signed-event boundary, durable processing, business rules and automation pause.
+  <p>Crisp or Chatwoot owns the conversation inbox.<br>Replywork owns the checked decisions and business integration.</p>
 
-[Local sample](docs/demo.md) · [Architecture](docs/architecture.md) · [Crisp setup](docs/crisp.md)
+  <p><a href="https://github.com/vroslmend/replywork/actions/workflows/ci.yml"><img src="https://github.com/vroslmend/replywork/actions/workflows/ci.yml/badge.svg" alt="CI status"></a></p>
+
+  <p><a href="docs/demo.md">Local sample</a> · <a href="docs/architecture.md">Architecture</a> · <a href="docs/crisp.md">Crisp setup</a></p>
+</div>
 
 ## An answer you can check
 
@@ -21,9 +23,11 @@ request, look up the approved synthetic product and reply with **PKR 1,800; list
 The model extracts a bounded request; local code renders stored facts from PostgreSQL. It cannot
 invent a price, change stock or place an order.
 
-The retained [sample storefront](examples/crisp/) shows three synthetic products, copyable questions
-and a deliberately opened Crisp widget. It is a localhost test surface, not a real shop or a second
-helpdesk UI. Its operator section copies scoped commands rather than exposing database controls.
+The retained [interactive sample](examples/crisp/) shows a question, its approved source record and
+a reply or handoff decision. Three illustrative paths are labelled as previews, not live runs. The
+compact catalog and copyable questions support a deliberately opened Crisp widget below. It is a
+localhost test surface, not a real shop or a second helpdesk UI. Its operator section copies scoped
+commands rather than exposing database controls.
 
 ![Replywork local sample catalog and conversation test surface](assets/sample-catalog.png)
 
