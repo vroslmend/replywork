@@ -2,5 +2,7 @@ coverage/
 dist/
 node_modules/
 _local/
+.playwright-cli/
+output/
 pnpm-lock.yaml
 supabase/migrations/*.sql

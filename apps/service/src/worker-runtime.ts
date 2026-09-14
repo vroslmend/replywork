@@ -31,34 +31,43 @@ const createConversationProvider = (config: WorkerConfig): ConversationProvider 
           : { handoffTeamId: config.CHATWOOT_HANDOFF_TEAM_ID }),
       });
 
-export const runConfiguredWorkerOnce = async (config: WorkerConfig): Promise<WorkerRunResult> => {
+export const createConfiguredWorker = (config: WorkerConfig) => {
   const database = createDatabase(config.DATABASE_URL);
   const auditStore = new PostgresAuditStore(database.sql);
 
-  try {
-    return await runWorkerOnce(
-      {
-        accountId: workerAccountId(config),
-        auditStore,
-        conversationAutomation: new PostgresConversationAutomation(database.sql),
-        conversationProvider: createConversationProvider(config),
-        deliveryQueue: new PgmqDeliveryQueue(database.sql),
-        responder: createWorkerResponder(config, {
+  return {
+    close: database.close,
+    runOnce: (): Promise<WorkerRunResult> =>
+      runWorkerOnce(
+        {
+          accountId: workerAccountId(config),
           auditStore,
-          catalog: new PostgresCatalog(database.sql),
-          ...(config.REPLYWORK_RESPONDER === "catalog-natural"
-            ? {
-                interpreter: createGoogleCatalogInterpreter({
-                  apiKey: config.GOOGLE_GENERATIVE_AI_API_KEY,
-                  modelId: config.REPLYWORK_CATALOG_MODEL,
-                }),
-              }
-            : {}),
-        }),
-      },
-      { visibilityTimeoutSeconds: config.WORKER_VISIBILITY_TIMEOUT_SECONDS },
-    );
+          conversationAutomation: new PostgresConversationAutomation(database.sql),
+          conversationProvider: createConversationProvider(config),
+          deliveryQueue: new PgmqDeliveryQueue(database.sql),
+          responder: createWorkerResponder(config, {
+            auditStore,
+            catalog: new PostgresCatalog(database.sql),
+            ...(config.REPLYWORK_RESPONDER === "catalog-natural"
+              ? {
+                  interpreter: createGoogleCatalogInterpreter({
+                    apiKey: config.GOOGLE_GENERATIVE_AI_API_KEY,
+                    modelId: config.REPLYWORK_CATALOG_MODEL,
+                  }),
+                }
+              : {}),
+          }),
+        },
+        { visibilityTimeoutSeconds: config.WORKER_VISIBILITY_TIMEOUT_SECONDS },
+      ),
+  };
+};
+
+export const runConfiguredWorkerOnce = async (config: WorkerConfig): Promise<WorkerRunResult> => {
+  const worker = createConfiguredWorker(config);
+  try {
+    return await worker.runOnce();
   } finally {
-    await database.close();
+    await worker.close();
   }
 };

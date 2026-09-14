@@ -60,5 +60,6 @@ invocation to finish before relying on a manual pause for exclusive takeover.
 The default fixed responder does not choose handoff; manual controls still apply. Catalog mode hands
 off requests outside `/catalog`; natural catalog mode uses its interpreter's handoff decision.
 Paused messages do not invoke either responder or model. Database tests verify stored state, retry
-suppression, scope isolation, resume cutoffs and the queue/provider-request boundary. Live provider
-compatibility and an unattended customer interface remain unverified.
+suppression, scope isolation, resume cutoffs and the queue/provider-request boundary. A separate
+[controlled Crisp development check](crisp.md#verified-development-boundary) verified live handoff,
+pause suppression and explicit resume. This does not establish an unattended customer deployment.

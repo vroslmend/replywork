@@ -28,7 +28,12 @@ export const startService = async (
   const config = loadServiceConfig(environment);
   const app = createServiceRuntime(config);
 
-  await app.listen({ host: "0.0.0.0", port: config.PORT });
+  try {
+    await app.listen({ host: "0.0.0.0", port: config.PORT });
+  } catch (error) {
+    await app.close();
+    throw error;
+  }
 
   return app;
 };

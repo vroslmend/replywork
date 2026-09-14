@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Replywork: a reply backed by work</title>
+  <g stroke="#547868" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M22 9h27a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6H32L20 50V41a6 6 0 0 1-6-6V15a6 6 0 0 1 6-6h2Z"/>
+    <path d="M8 25v25a7 7 0 0 0 7 7h25"/>
+    <path d="M25 21h19M25 29h13"/>
+  </g>
+</svg>

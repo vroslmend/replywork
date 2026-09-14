@@ -93,7 +93,9 @@ an order lookup.
 
 Database worker tests exercise signed admission, the real catalog adapter, outgoing reply requests,
 no matches, handoff requests, provider failure/retry and the account boundary. Provider HTTP
-responses remain controlled in these tests; a live instance is still unverified.
+responses remain controlled in these tests. A separate
+[Crisp development check](crisp.md#verified-development-boundary) verified a live catalog reply;
+Chatwoot has not been checked against a live instance.
 
 This explicit command remains an integration boundary for controlled testing. Real catalog import,
 live commerce availability and automatic detection of proactive operator takeover are separate work.

@@ -28,9 +28,15 @@ CRISP_API_BASE_URL=https://api.crisp.chat
 ```
 
 Keep the existing local `DATABASE_URL`. Apply the migrations before admitting Crisp messages. Start
-the API with `pnpm dev:service`; process one queued message with `pnpm worker:once`. Start with a
-fixed synthetic reply, then select the already-tested catalog responder once the transport works.
-Neither command automatically deploys anything.
+the API with `corepack pnpm dev:service`; process one queued message with
+`corepack pnpm worker:once`, or opt into sequential processing with `corepack pnpm worker:run`.
+Start with a fixed synthetic reply, then choose `catalog` for explicit `/catalog` requests or
+`catalog-natural` for ordinary questions with an explicitly configured model. Neither command
+automatically deploys anything.
+
+The retained `corepack pnpm demo:crisp` sample is localhost-only and loads the widget only when
+opened. See the [complete start-to-stop workflow](demo.md), including temporary tunnel setup,
+webhook URL updates and copyable operator controls.
 
 The plugin's Toolkit callback, settings and action URLs, widget definition, public listing and
 production token are not needed for this development check.

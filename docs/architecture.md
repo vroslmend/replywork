@@ -29,6 +29,11 @@ API -> delivery receipt -> queue -> worker
 The inbox provider owns transport, conversation history, and the operator inbox. Replywork does not
 rebuild those features.
 
+The worker can run once or in an explicitly started sequential polling loop. The loop reuses a
+database pool, waits after idle reads, drains its active delivery on shutdown and stops on a
+processing failure. It does not create concurrent workers or an unbounded model retry policy. The
+localhost-only [sample](demo.md) is an optional test surface, not another production runtime.
+
 ## Admission before processing
 
 The webhook path verifies the provider's documented signature, rejects stale requests, normalizes

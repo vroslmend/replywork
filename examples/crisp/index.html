@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A local sample catalog for Replywork's grounded answers and human handoff."
+    />
+    <title>Replywork · sample catalog</title>
+    <link rel="icon" href="/replywork-mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/demo.css" />
+    <script type="module" src="/demo.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#catalog">Skip to catalog</a>
+    <div class="page">
+      <header class="masthead">
+        <a class="brand" href="/" aria-label="Replywork sample home">
+          <img src="/replywork-mark.svg" width="46" height="46" alt="" />
+          <span>replywork</span>
+        </a>
+        <span class="environment">Local sample / not a real store</span>
+      </header>
+      <main>
+        <section class="intro" aria-labelledby="heading">
+          <p class="eyebrow">The work behind the reply.</p>
+          <h1 id="heading">A small catalog.<br />An answer you can check.</h1>
+          <p class="lede">
+            Ask about a product's recorded price or availability. Replywork looks up approved facts,
+            or leaves the conversation to a human when the question goes beyond them.
+          </p>
+        </section>
+        <div class="workspace">
+          <section id="catalog" class="catalog" aria-labelledby="catalog-heading">
+            <div class="section-heading">
+              <h2 id="catalog-heading">Example goods</h2>
+              <span class="utility">Synthetic seed records</span>
+            </div>
+            <div class="products">
+              <article class="product">
+                <div class="product-drawing" aria-hidden="true">
+                  <svg viewBox="0 0 180 140" fill="none">
+                    <path d="M47 49h86l-7 74H54l-7-74Z" />
+                    <path d="M69 59V38a21 21 0 0 1 42 0v21" />
+                    <path class="drawing-detail" d="m61 113 5-47m50 47-5-47" />
+                  </svg>
+                </div>
+                <div class="product-info">
+                  <h3>Canvas tote</h3>
+                  <p class="description">Natural cotton. Two handles.</p>
+                  <p class="price">PKR 1,800 <span class="availability">Listed available</span></p>
+                </div>
+              </article>
+              <article class="product">
+                <div class="product-drawing" aria-hidden="true">
+                  <svg viewBox="0 0 180 140" fill="none">
+                    <path d="M45 43h71v58a20 20 0 0 1-20 20H65a20 20 0 0 1-20-20V43Z" />
+                    <path d="M116 56h10a22 22 0 0 1 0 44h-10" />
+                    <path class="drawing-detail" d="M52 52h57M55 111h51" />
+                  </svg>
+                </div>
+                <div class="product-info">
+                  <h3>Stoneware mug</h3>
+                  <p class="description">Glazed ceramic. 300 ml.</p>
+                  <p class="price">PKR 1,200 <span class="availability">Listed available</span></p>
+                </div>
+              </article>
+              <article class="product">
+                <div class="product-drawing" aria-hidden="true">
+                  <svg viewBox="0 0 180 140" fill="none">
+                    <path d="M59 22h71v101H59a10 10 0 0 1-10-10V32a10 10 0 0 1 10-10Z" />
+                    <path d="M59 22v91m-10 0h81" />
+                    <path class="drawing-detail" d="M75 47h37M75 57h25m13 64v-8" />
+                  </svg>
+                </div>
+                <div class="product-info">
+                  <h3>Pocket notebook</h3>
+                  <p class="description">A6. 64 plain pages.</p>
+                  <p class="price">
+                    PKR 450 <span class="availability unavailable">Listed unavailable</span>
+                  </p>
+                </div>
+              </article>
+            </div>
+            <p class="catalog-note">
+              These are examples from the seed file, not a live stock display. Chat answers read the
+              approved database records; a listed price is not a checkout total or reservation.
+            </p>
+            <div class="boundary" aria-label="Replywork processing path">
+              <span>Signed message</span><span aria-hidden="true">→</span><span>Durable queue</span
+              ><span aria-hidden="true">→</span><span>Approved facts</span
+              ><span aria-hidden="true">→</span><span>Reply or handoff</span>
+            </div>
+          </section>
+          <aside class="conversation" aria-labelledby="conversation-heading">
+            <div class="conversation-heading">
+              <img src="/replywork-mark.svg" width="34" height="34" alt="" />
+              <p class="eyebrow">Test the conversation</p>
+            </div>
+            <h2 id="conversation-heading">Start with a question.</h2>
+            <p>
+              Copy a prompt, open the chat, then send it yourself. Nothing is sent automatically.
+            </p>
+            <div class="questions" aria-label="Example prompts">
+              <button
+                class="question"
+                data-question="What is the price and availability of the canvas tote?"
+              >
+                <span>What is the price and availability of the canvas tote?</span
+                ><span class="copy-label">Copy question</span>
+              </button>
+              <button class="question" data-question="Do you have the pocket notebook?">
+                <span>Do you have the pocket notebook?</span
+                ><span class="copy-label">Copy question</span>
+              </button>
+              <button class="question" data-question="I need a human">
+                <span>I need a human</span><span class="copy-label">Copy question</span>
+              </button>
+            </div>
+            <button id="open-chat" class="primary" disabled>
+              Open test chat <span aria-hidden="true">↗</span>
+            </button>
+            <p id="chat-status" class="notice" role="status">Checking local chat configuration…</p>
+            <p class="small-note">
+              Crisp owns the widget and operator inbox. Replywork owns the checked answer and
+              handoff state. The API and worker must be running for automated replies.
+            </p>
+            <details class="operator">
+              <summary>Local operator controls</summary>
+              <p>
+                After sending your first message, copy a command into a Replywork terminal. These
+                buttons only copy commands; they do not change state.
+              </p>
+              <p>
+                Wait for an active reply to finish before pausing, then reply from the Crisp
+                operator inbox. Resume deliberately before sending a fresh customer message.
+              </p>
+              <p class="session-label">Test session</p>
+              <code id="session-id">Available after the chat session loads.</code>
+              <div class="control-buttons">
+                <button data-control="status" disabled>Copy status</button
+                ><button data-control="pause" disabled>Copy pause</button
+                ><button data-control="resume" disabled>Copy resume</button>
+              </div>
+            </details>
+          </aside>
+        </div>
+      </main>
+      <footer>
+        <span>replywork</span>
+        <p>A reference integration. No orders, checkout, payment or stock changes.</p>
+      </footer>
+      <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
+    </div>
+  </body>
+</html>

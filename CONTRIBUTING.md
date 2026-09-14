@@ -8,12 +8,16 @@ its scope and security implications can be agreed first.
 Use Node.js 24 and pnpm 12. Before opening a pull request, run:
 
 ```bash
-pnpm verify
+corepack pnpm verify
 ```
 
-The default test suite must not call Chatwoot, Supabase, WooCommerce, or a model provider. Use fakes
-for unit and contract tests. Integration tests must be explicitly named and isolated from production
+The default test suite must not call Crisp, Chatwoot, Supabase, or a model provider. Use fakes for
+unit and contract tests. Integration tests must be explicitly named and isolated from production
 credentials and customer data.
+
+The [local sample](docs/demo.md) is the supported visual test surface. Keep it synthetic,
+localhost-only and explicit about widget versus backend readiness. Preserve keyboard focus, mobile
+layout and the no-automatic-message behavior when changing it.
 
 ## Pull requests
 

@@ -1,6 +1,22 @@
 import { describe, expect, it } from "vitest";
 
-import { loadServiceConfig, loadWorkerConfig } from "../src/config.js";
+import { loadCrispDemoConfig, loadServiceConfig, loadWorkerConfig } from "../src/config.js";
+
+describe("loadCrispDemoConfig", () => {
+  it("allows an unconfigured sample and validates its public settings", () => {
+    expect(loadCrispDemoConfig({})).toEqual({ CRISP_WEBSITE_ID: undefined, DEMO_PORT: 3001 });
+    expect(
+      loadCrispDemoConfig({
+        CRISP_WEBSITE_ID: "11111111-1111-4111-8111-111111111111",
+        DEMO_PORT: "3101",
+      }),
+    ).toEqual({
+      CRISP_WEBSITE_ID: "11111111-1111-4111-8111-111111111111",
+      DEMO_PORT: 3101,
+    });
+    expect(() => loadCrispDemoConfig({ CRISP_WEBSITE_ID: "not-a-uuid" })).toThrow();
+  });
+});
 
 describe("loadServiceConfig", () => {
   it("parses valid startup configuration", () => {

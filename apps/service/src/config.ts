@@ -77,6 +77,18 @@ export type WorkerConfig = z.infer<typeof workerConfigSchema>;
 export const loadCatalogConfig = (environment: NodeJS.ProcessEnv): z.infer<typeof databaseSchema> =>
   databaseSchema.parse(environment);
 
+const crispDemoSchema = z.object({
+  CRISP_WEBSITE_ID: z.preprocess(
+    (value) => (value === "" || value === undefined ? undefined : value),
+    z.uuid().optional(),
+  ),
+  DEMO_PORT: z.coerce.number().int().min(1).max(65_535).default(3001),
+});
+
+export const loadCrispDemoConfig = (
+  environment: NodeJS.ProcessEnv,
+): z.infer<typeof crispDemoSchema> => crispDemoSchema.parse(environment);
+
 const catalogQuestionSchema = databaseSchema.extend(catalogModelSchema.shape);
 
 export const loadCatalogQuestionConfig = (
