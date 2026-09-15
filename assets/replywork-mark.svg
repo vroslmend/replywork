@@ -1,8 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
-  <title id="title">Replywork: a reply backed by work</title>
-  <g stroke="#547868" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M22 9h27a6 6 0 0 1 6 6v20a6 6 0 0 1-6 6H32L20 50V41a6 6 0 0 1-6-6V15a6 6 0 0 1 6-6h2Z"/>
-    <path d="M8 25v25a7 7 0 0 0 7 7h25"/>
-    <path d="M25 21h19M25 29h13"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Replywork: a highlighted r</title>
+  <rect x="6" y="27" width="52" height="30" rx="3" fill="#ffe14d"/>
+  <path d="M21.74 52Q21.74 47.57 21.74 43.43Q21.74 39.28 21.74 34.14V30Q21.74 25.24 21.74 20.42Q21.74 15.61 21.74 10.66L32.65 10.03L33.19 17.52H34.26Q35.86 14.21 37.79 12.49Q39.72 10.76 41.73 10.13Q43.74 9.5 45.57 9.5Q46.49 9.5 47.67 9.67Q48.85 9.83 49.88 10.27L48.76 22.87Q47.14 22.74 45.84 22.67Q44.53 22.59 43.06 22.59Q41.91 22.59 40.73 22.84Q39.54 23.09 38.44 23.78Q37.34 24.47 36.39 25.71Q35.43 26.94 34.72 28.9V34.85Q34.72 39.45 34.72 43.51Q34.72 47.57 34.72 52Z" fill="#000" stroke="#fff" stroke-width="2.5" stroke-linejoin="round" paint-order="stroke"/>
 </svg>
