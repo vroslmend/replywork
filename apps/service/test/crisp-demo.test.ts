@@ -7,6 +7,7 @@ const files = {
   html: "<!doctype html><title>Replywork</title>",
   javascript: "void 0;",
   mark: "<svg></svg>",
+  fonts: { mono: Buffer.from("mono"), sans: Buffer.from("sans") },
 };
 
 const apps: ReturnType<typeof createCrispDemo>[] = [];
@@ -40,7 +41,16 @@ describe("createCrispDemo", () => {
     expect((await app.inject("/replywork-mark.svg")).headers["content-type"]).toContain(
       "image/svg+xml",
     );
-    for (const path of ["/unknown", "/.env", "/_local/CONTEXT.md", "/package.json"]) {
+    for (const path of ["/fonts/commissioner.woff2", "/fonts/atkinson-hyperlegible-mono.woff2"]) {
+      expect((await app.inject(path)).headers["content-type"]).toContain("font/woff2");
+    }
+    for (const path of [
+      "/unknown",
+      "/.env",
+      "/_local/CONTEXT.md",
+      "/package.json",
+      "/fonts/OFL-commissioner.txt",
+    ]) {
       expect((await app.inject(path)).statusCode).toBe(404);
     }
   });

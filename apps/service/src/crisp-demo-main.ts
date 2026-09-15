@@ -15,8 +15,20 @@ try {
       "../../../assets/replywork-mark.svg",
     ].map((path) => readFile(new URL(path, import.meta.url), "utf8")),
   );
+  const [sans, mono] = await Promise.all(
+    [
+      "../../../examples/crisp/fonts/commissioner.woff2",
+      "../../../examples/crisp/fonts/atkinson-hyperlegible-mono.woff2",
+    ].map((path) => readFile(new URL(path, import.meta.url))),
+  );
   const app = createCrispDemo(
-    { html: html!, css: css!, javascript: javascript!, mark: mark! },
+    {
+      html: html!,
+      css: css!,
+      javascript: javascript!,
+      mark: mark!,
+      fonts: { mono: mono!, sans: sans! },
+    },
     config.CRISP_WEBSITE_ID,
   );
   await app.listen({ host: "127.0.0.1", port: config.DEMO_PORT });
