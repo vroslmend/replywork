@@ -19,17 +19,15 @@
 ## An answer you can check
 
 Ask **“What is the price and availability of the canvas tote?”** The worker can interpret the
-request, look up the approved synthetic product and reply with **PKR 1,800; listed as available**.
-The model extracts a bounded request; local code renders stored facts from PostgreSQL. It cannot
-invent a price, change stock or place an order.
+request, look up the approved synthetic product and reply with **PKR 1,800.00; listed as
+available**. The model extracts a bounded request; local code renders stored facts from PostgreSQL.
+It cannot invent a price, change stock or place an order.
 
-The retained [interactive sample](examples/crisp/) shows a question, its approved source record and
-a reply or handoff decision. Three illustrative paths are labelled as previews, not live runs. The
-compact catalog and copyable questions support a deliberately opened Crisp widget below. It is a
-localhost test surface, not a real shop or a second helpdesk UI. Its operator section copies scoped
-commands rather than exposing database controls.
+![A customer asks about the canvas tote, Replywork finds its row in the approved catalog, and the reply repeats that row's price, availability and description](assets/reply-sources.png)
 
-![Replywork local sample catalog and conversation test surface](assets/sample-catalog.png)
+The [local test page](examples/crisp/) lists these questions with their expected replies, the seed
+catalog and copyable takeover commands. It opens a Crisp test chat only when you ask. It is a
+localhost test surface, not a shop or a second inbox.
 
 ## Try it
 

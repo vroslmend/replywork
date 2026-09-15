@@ -7,7 +7,7 @@ a new frontend framework.
 The page lists test questions with the replies the responder produces for the seed catalog. Expected
 replies are static text; the page does not read the database or show live conversation state. The
 bundled Commissioner and Atkinson Hyperlegible Mono fonts are distributed under the SIL Open Font
-License; see `fonts/`.
+License; see `fonts/`. `assets/figure/reply-sources.html` is the source for the README figure.
 
 Run `corepack pnpm demo:crisp` from the repository root, then open `http://127.0.0.1:3001`. The page
 renders without credentials. Only the public test-workspace website ID is served; the Crisp script

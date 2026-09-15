@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Replywork README figure</title>
+    <!--
+      Source for assets/reply-sources.png. Serve this file with examples/crisp/fonts at the same
+      relative path, open it at a 1600px-wide viewport and capture the .figure element.
+      The reply is the responder's real output for the seed catalog.
+    -->
+    <style>
+      @font-face {
+        font-family: "Commissioner";
+        src: url("../../examples/crisp/fonts/commissioner.woff2") format("woff2");
+        font-weight: 100 900;
+      }
+
+      :root {
+        --paper: #ffffff;
+        --ink: #000000;
+        --quiet: #5b5e66;
+        --faint: #d9dce1;
+        --panel: #f3f4f6;
+        --mark-price: #ffe14d;
+        --mark-stock: #9dd7ff;
+        --mark-text: #c4efb6;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Commissioner", sans-serif;
+      }
+
+      .figure {
+        width: 1600px;
+        padding: 72px 93px 76px;
+        border: 3px solid var(--ink);
+      }
+
+      .step + .step {
+        margin-top: 60px;
+      }
+
+      .caption {
+        display: flex;
+        align-items: baseline;
+        gap: 18px;
+        font-size: 30px;
+        font-weight: 600;
+      }
+
+      .caption span {
+        flex: none;
+        width: 26px;
+        color: var(--quiet);
+        font-weight: 500;
+      }
+
+      .body {
+        margin-top: 20px;
+        margin-left: 44px;
+      }
+
+      .question {
+        font-size: 40px;
+        line-height: 1.25;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 27px;
+        line-height: 1.3;
+      }
+
+      th,
+      td {
+        padding: 13px 28px 13px 0;
+        border-bottom: 2px solid var(--faint);
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      th {
+        padding-top: 0;
+        color: var(--quiet);
+        font-weight: 500;
+      }
+
+      tbody tr:not(.match) {
+        color: var(--quiet);
+      }
+
+      .match td:first-child {
+        font-weight: 600;
+      }
+
+      mark {
+        color: inherit;
+        padding: 0.06em 0.16em;
+      }
+
+      .price {
+        background: var(--mark-price);
+      }
+
+      .stock {
+        background: var(--mark-stock);
+      }
+
+      .text {
+        background: var(--mark-text);
+      }
+
+      td mark {
+        margin-left: -0.16em;
+      }
+
+      .reply {
+        padding: 26px 32px;
+        border-radius: 10px;
+        background: var(--panel);
+        font-size: 36px;
+        line-height: 1.5;
+        font-weight: 500;
+      }
+
+      .reply .line-start {
+        margin-left: -0.16em;
+      }
+
+      .aside {
+        margin-top: 18px;
+        font-size: 27px;
+        line-height: 1.35;
+        color: var(--quiet);
+      }
+
+      .handoff {
+        margin-top: 56px;
+        padding-top: 30px;
+        border-top: 3px solid var(--ink);
+        font-size: 30px;
+        line-height: 1.35;
+      }
+
+      .handoff b {
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="figure">
+      <section class="step">
+        <p class="caption"><span>1</span>A customer asks in your chat</p>
+        <div class="body">
+          <p class="question">“What is the price and availability of the canvas tote?”</p>
+        </div>
+      </section>
+
+      <section class="step">
+        <p class="caption"><span>2</span>Replywork finds the product in your approved catalog</p>
+        <div class="body">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Availability</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="match">
+                <td>Canvas tote</td>
+                <td><mark class="price">PKR 1,800.00</mark></td>
+                <td><mark class="stock">available</mark></td>
+                <td>
+                  <mark class="text">Synthetic product. Natural cotton bag with two handles.</mark>
+                </td>
+              </tr>
+              <tr>
+                <td>Stoneware mug</td>
+                <td>PKR 1,200.00</td>
+                <td>available</td>
+                <td>Synthetic product. A 300 ml glazed ceramic mug.</td>
+              </tr>
+              <tr>
+                <td>Pocket notebook</td>
+                <td>PKR 450.00</td>
+                <td>unavailable</td>
+                <td>Synthetic product. A6 notebook with 64 plain pages.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="step">
+        <p class="caption"><span>3</span>It replies with those exact values</p>
+        <div class="body">
+          <div class="reply">
+            <p>Catalog matches:</p>
+            <p>Canvas tote (example-canvas-tote)</p>
+            <p>
+              <mark class="price line-start">PKR 1,800.00</mark>; listed as
+              <mark class="stock">available</mark>
+            </p>
+            <p>
+              <mark class="text line-start"
+                >Synthetic product. Natural cotton bag with two handles.</mark
+              >
+            </p>
+          </div>
+          <p class="aside">
+            AI only works out which product is meant. Price and stock come from your catalog, so
+            they can’t be made up.
+          </p>
+        </div>
+      </section>
+
+      <p class="handoff">
+        <b>Anything the catalog can’t answer</b>, like a refund or a request for a person, is handed
+        to your team instead, and Replywork stops replying in that chat.
+      </p>
+    </main>
+  </body>
+</html>
