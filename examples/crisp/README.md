@@ -2,11 +2,12 @@
 
 A localhost-only synthetic catalog-and-handoff demonstration for Replywork's existing Crisp
 integration. It retains the test surface without adding a second inbox, browser database controls or
-a new frontend framework. The source-record layout and Replywork SVG mark are repository-native
-assets.
+a new frontend framework.
 
-The main visual switches between three explicitly illustrative cases without contacting a model,
-database or inbox provider. It does not claim to display current state or an actual handoff reply.
+The page lists test questions with the replies the responder produces for the seed catalog. Expected
+replies are static text; the page does not read the database or show live conversation state. The
+bundled Commissioner and Atkinson Hyperlegible Mono fonts are distributed under the SIL Open Font
+License; see `fonts/`.
 
 Run `corepack pnpm demo:crisp` from the repository root, then open `http://127.0.0.1:3001`. The page
 renders without credentials. Only the public test-workspace website ID is served; the Crisp script

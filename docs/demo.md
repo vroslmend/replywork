@@ -4,10 +4,9 @@ The supported sample is a synthetic catalog-and-handoff demonstration with Crisp
 widget. Replywork remains the service behind the inbox, not a replacement inbox UI. Nothing is
 installed on your portfolio or a customer site, and no message is sent automatically.
 
-The three-step preview shows the relationship between a customer question, approved source and
-result. Its Canvas tote, Unavailable item and Human help buttons switch illustrative examples only:
-no database, model or provider request is made, and no session is paused. The actual Crisp test
-controls live below the preview and remain a separate, explicitly started path.
+The page lists three test questions and the reply each should produce. Highlighted values in an
+expected reply match the seed catalog beside it. Copy buttons only copy text; nothing reaches Crisp
+until you send it in the chat yourself.
 
 ## Render the page only
 
@@ -90,9 +89,9 @@ controlled attempt.
 
 ## Human takeover and returning automation
 
-The sample's **Operator controls** section displays the current Crisp session ID after the widget
-loads. Its buttons **copy commands only**; run them in a trusted terminal at the repository root.
-These commands need database access, not a browser API or model key:
+The sample's **Take over a conversation** section displays the current Crisp session ID after the
+widget loads. Its buttons **copy commands only**; run them in a trusted terminal at the repository
+root. These commands need database access, not a browser API or model key:
 
 ```sh
 corepack pnpm conversation:control status <session-id>
@@ -100,9 +99,9 @@ corepack pnpm conversation:control pause <session-id>
 corepack pnpm conversation:control resume <session-id>
 ```
 
-In natural mode, **“I need a human”** is intended to request handoff: Replywork saves the pause and
-marks the Crisp conversation unresolved. It does not guarantee a customer-facing handoff message,
-assign an operator or create a private note. Check the Inbox and stored control state.
+In natural mode, **“Can I speak to a person?”** is intended to request handoff: Replywork saves the
+pause and marks the Crisp conversation unresolved. It does not guarantee a customer-facing handoff
+message, assign an operator or create a private note. Check the Inbox and stored control state.
 
 For proactive manual takeover, stop the worker with Ctrl+C and let its active delivery finish, then
 pause the session before replying in Crisp's Inbox. An HTTP send already started cannot be recalled.

@@ -3,226 +3,165 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="See how Replywork turns a catalog question into a checked answer or human handoff."
-    />
-    <title>Replywork · the work behind the reply</title>
+    <meta name="description" content="Send test questions to Replywork through a Crisp chat." />
+    <title>Replywork local Crisp test</title>
     <link rel="icon" href="/replywork-mark.svg" type="image/svg+xml" />
+    <link rel="preload" href="/fonts/commissioner.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/demo.css" />
     <script type="module" src="/demo.js"></script>
   </head>
   <body>
-    <a class="skip-link" href="#example-path">Skip to the example</a>
-    <div class="page">
-      <header class="masthead">
-        <a class="brand" href="/" aria-label="Replywork sample home">
-          <img src="/replywork-mark.svg" width="36" height="36" alt="" />
-          <span>replywork</span>
-        </a>
-        <nav aria-label="Sample navigation">
-          <a href="#example-path">The path</a>
-          <a href="#catalog">Source records</a>
-        </nav>
-        <a class="test-link" href="#test-chat">Test in Crisp <span aria-hidden="true">↗</span></a>
-      </header>
-      <main>
-        <section class="intro" aria-labelledby="heading">
-          <h1 id="heading">The work<br /><span>before the reply.</span></h1>
-          <div class="intro-copy">
-            <p class="lede">
-              Replywork checks customer questions against approved catalog records. When it cannot
-              answer, a human takes over.
-            </p>
-            <p class="environment">Local demo. Synthetic catalog.</p>
-            <a href="#example-path">See an example <span aria-hidden="true">↓</span></a>
+    <header class="masthead">
+      <p class="wordmark">
+        <img src="/replywork-mark.svg" width="30" height="30" alt="" />replywork
+      </p>
+      <p class="context">Local Crisp test with a synthetic catalog</p>
+    </header>
+
+    <main class="layout">
+      <section class="test" aria-labelledby="test-heading">
+        <h1 id="test-heading">Send a test question</h1>
+        <p class="intro">
+          Open the chat, paste a question and send it. Check the reply against the highlighted
+          catalog values. Replies need the API, worker, database and tunnel from
+          <code>docs/demo.md</code>.
+        </p>
+
+        <div class="chat">
+          <button id="open-chat" class="primary" type="button" disabled>Open test chat</button>
+          <p id="chat-status" class="chat-status" role="status">Checking chat setup…</p>
+        </div>
+
+        <ol class="cases">
+          <li class="case">
+            <div class="turn">
+              <p class="speaker">You send</p>
+              <div class="line">
+                <p class="question">What is the price and availability of the canvas tote?</p>
+                <button
+                  class="copy"
+                  type="button"
+                  data-copy="What is the price and availability of the canvas tote?"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div class="turn">
+              <p class="speaker">Expected</p>
+              <p class="reply">
+                Catalog matches:<br /><br />Canvas tote (example-canvas-tote)<br /><mark
+                  class="price"
+                  >PKR 1,800.00</mark
+                >; listed as <mark class="stock">available</mark><br /><mark class="text"
+                  >Synthetic product. Natural cotton bag with two handles.</mark
+                >
+              </p>
+            </div>
+          </li>
+
+          <li class="case">
+            <div class="turn">
+              <p class="speaker">You send</p>
+              <div class="line">
+                <p class="question">Do you have the pocket notebook?</p>
+                <button class="copy" type="button" data-copy="Do you have the pocket notebook?">
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div class="turn">
+              <p class="speaker">Expected</p>
+              <p class="reply">
+                Pocket notebook (example-pocket-notebook)<br />Listed as
+                <mark class="stock">unavailable</mark> in the catalog. This is not a stock
+                reservation.
+              </p>
+            </div>
+          </li>
+
+          <li class="case">
+            <div class="turn">
+              <p class="speaker">You send</p>
+              <div class="line">
+                <p class="question">Can I speak to a person?</p>
+                <button class="copy" type="button" data-copy="Can I speak to a person?">
+                  Copy
+                </button>
+              </div>
+            </div>
+            <div class="turn">
+              <p class="speaker">Expected</p>
+              <p class="outcome">
+                No reply. The conversation is marked unresolved in Crisp and automation pauses until
+                you resume it.
+              </p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <aside class="reference">
+        <section aria-labelledby="catalog-heading">
+          <h2 id="catalog-heading">Seed catalog</h2>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Product</th>
+                  <th scope="col"><span class="key price"></span>Price</th>
+                  <th scope="col"><span class="key stock"></span>Listed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Canvas tote<code>example-canvas-tote</code></th>
+                  <td>PKR 1,800.00</td>
+                  <td>available</td>
+                </tr>
+                <tr>
+                  <th scope="row">Stoneware mug<code>example-stoneware-mug</code></th>
+                  <td>PKR 1,200.00</td>
+                  <td>available</td>
+                </tr>
+                <tr>
+                  <th scope="row">Pocket notebook<code>example-pocket-notebook</code></th>
+                  <td>PKR 450.00</td>
+                  <td>unavailable</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+          <p class="note">
+            <span class="key text"></span>Descriptions are copied as stored. Values come from
+            <code>catalog.example.sql</code>; if you edit your database, replies follow it.
+          </p>
         </section>
 
-        <section id="example-path" class="example-frame" aria-labelledby="path-heading">
-          <div class="frame-header">
-            <h2 id="path-heading">From question to answer</h2>
-            <div class="preview-options" role="group" aria-label="Illustrative examples">
-              <button data-preview="tote" aria-pressed="true">Canvas tote</button>
-              <button data-preview="notebook" aria-pressed="false">Unavailable item</button>
-              <button data-preview="handoff" aria-pressed="false">Human help</button>
-            </div>
+        <section aria-labelledby="takeover-heading">
+          <h2 id="takeover-heading">Take over a conversation</h2>
+          <ol class="steps">
+            <li>Stop the worker with Ctrl+C and let it finish.</li>
+            <li>Pause the session, then reply from the Crisp inbox.</li>
+            <li>Resume when Replywork should answer again, then send a new question.</li>
+          </ol>
+          <p class="session">
+            Session: <span id="session-id">open the test chat to get its ID</span>
+          </p>
+          <p class="command">
+            <code id="command"
+              >corepack pnpm conversation:control &lt;action&gt; &lt;session-id&gt;</code
+            >
+          </p>
+          <div class="controls">
+            <button class="copy" type="button" data-control="status" disabled>Copy status</button>
+            <button class="copy" type="button" data-control="pause" disabled>Copy pause</button>
+            <button class="copy" type="button" data-control="resume" disabled>Copy resume</button>
           </div>
-          <div class="example-stage">
-            <div class="request-column">
-              <p class="step-label"><span>01</span> Customer question</p>
-              <div class="request">
-                <p id="preview-question">What is the price and availability of the canvas tote?</p>
-              </div>
-              <p id="preview-routing" class="routing-note">
-                Replywork identifies the product and the question.
-              </p>
-            </div>
-
-            <div class="source-stack">
-              <p class="step-label"><span>02</span> Check the record</p>
-              <article class="source-sheet" aria-labelledby="preview-title">
-                <div class="sheet-header">
-                  <span id="preview-source-label">Approved source</span>
-                </div>
-                <h3 id="preview-title">Canvas tote</h3>
-                <p id="preview-id" class="record-id">example-canvas-tote</p>
-                <dl class="source-fields">
-                  <div class="primary-field">
-                    <dt id="preview-label-1">Stored price</dt>
-                    <dd id="preview-value-1">PKR 1,800</dd>
-                  </div>
-                  <div>
-                    <dt id="preview-label-2">Availability</dt>
-                    <dd id="preview-value-2">Listed available</dd>
-                  </div>
-                  <div>
-                    <dt id="preview-label-3">Description</dt>
-                    <dd id="preview-value-3">Natural cotton bag with two handles.</dd>
-                  </div>
-                </dl>
-                <p id="preview-source-note" class="sheet-footnote">
-                  Read only. No checkout or stock write.
-                </p>
-              </article>
-            </div>
-
-            <div class="result-column">
-              <p class="step-label">
-                <span>03</span> <span id="preview-result-label">Stored-fact reply</span>
-              </p>
-              <div class="response">
-                <p id="preview-result">The canvas tote is PKR 1,800; listed as available.</p>
-                <span id="preview-result-note">Recorded availability, not a reservation.</span>
-              </div>
-            </div>
-          </div>
-          <div class="frame-caption">
-            <p>
-              Illustrative examples. These controls do not run the service or change a conversation.
-            </p>
-          </div>
-          <p id="preview-status" class="sr-only" role="status"></p>
+          <p class="note">Run these from the repository root. Copying does not change anything.</p>
         </section>
-
-        <div class="support-grid">
-          <section id="catalog" class="catalog" aria-labelledby="catalog-heading">
-            <div class="section-heading">
-              <h2 id="catalog-heading">Example catalog</h2>
-            </div>
-            <p class="section-copy">Three sample records used by the local demonstration.</p>
-            <div class="catalog-table">
-              <table>
-                <caption class="sr-only">
-                  Illustrative catalog seed records
-                </caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Product</th>
-                    <th scope="col">Stored price</th>
-                    <th scope="col">Availability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">
-                      <span class="product-name">Canvas tote</span
-                      ><span class="product-detail">Natural cotton. Two handles.</span>
-                    </th>
-                    <td>PKR 1,800</td>
-                    <td><span class="availability">Available</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      <span class="product-name">Stoneware mug</span
-                      ><span class="product-detail">Glazed ceramic. 300 ml.</span>
-                    </th>
-                    <td>PKR 1,200</td>
-                    <td><span class="availability">Available</span></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">
-                      <span class="product-name">Pocket notebook</span
-                      ><span class="product-detail">A6. 64 plain pages.</span>
-                    </th>
-                    <td>PKR 450</td>
-                    <td><span class="availability unavailable">Unavailable</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p class="catalog-note">
-              These are examples from the seed file, not a live database view. Chat replies read the
-              current approved PostgreSQL records.
-            </p>
-            <div class="ownership">
-              <div>
-                <h3>Replywork</h3>
-                <p>Checked decisions, durable queue, audit and automation pause.</p>
-              </div>
-              <div>
-                <h3>Crisp</h3>
-                <p>Chat widget, conversation history and the human operator inbox.</p>
-              </div>
-            </div>
-          </section>
-
-          <section id="test-chat" class="conversation" aria-labelledby="conversation-heading">
-            <div class="section-heading">
-              <h2 id="conversation-heading">Test with Crisp</h2>
-            </div>
-            <p class="section-copy">
-              Copy a question, open Crisp and send it yourself. Nothing is sent automatically.
-            </p>
-            <div class="questions" aria-label="Example prompts">
-              <button
-                class="question"
-                data-question="What is the price and availability of the canvas tote?"
-              >
-                <span>What is the price and availability of the canvas tote?</span
-                ><span class="copy-label">Copy</span>
-              </button>
-              <button class="question" data-question="Do you have the pocket notebook?">
-                <span>Do you have the pocket notebook?</span><span class="copy-label">Copy</span>
-              </button>
-              <button class="question" data-question="I need a human">
-                <span>I need a human</span><span class="copy-label">Copy</span>
-              </button>
-            </div>
-            <button id="open-chat" class="button button-dark open-chat" disabled>
-              Open test chat <span aria-hidden="true">↗</span>
-            </button>
-            <p id="chat-status" class="notice" role="status">Checking local chat configuration…</p>
-            <p class="small-note">
-              Widget readiness is not backend readiness. Automated replies need the API, worker,
-              database and subscribed webhook.
-            </p>
-            <details class="operator">
-              <summary>Local operator controls</summary>
-              <p>These buttons only copy scoped terminal commands. They do not change state.</p>
-              <p>
-                Stop or wait for the active worker delivery before pausing. Reply in the Crisp
-                Inbox, then resume deliberately before sending a fresh customer question.
-              </p>
-              <p class="session-label">Test session</p>
-              <code id="session-id">Available after the chat session loads.</code>
-              <div class="control-buttons">
-                <button data-control="status" disabled>Copy status</button
-                ><button data-control="pause" disabled>Copy pause</button
-                ><button data-control="resume" disabled>Copy resume</button>
-              </div>
-            </details>
-          </section>
-        </div>
-      </main>
-      <footer>
-        <span class="footer-wordmark">replywork</span>
-        <div>
-          <p>A reference implementation. No orders, payments or stock changes.</p>
-        </div>
-        <a href="#example-path">Back to the example ↑</a>
-      </footer>
-      <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
-    </div>
+      </aside>
+    </main>
+    <p id="copy-status" class="sr-only" role="status"></p>
   </body>
 </html>
