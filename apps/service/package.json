@@ -14,6 +14,6 @@
     "@replywork/contracts": "workspace:*",
     "@replywork/core": "workspace:*",
     "fastify": "5.12.1",
-    "zod": "4.5.4"
+    "zod": "4.6.5"
   }
 }
